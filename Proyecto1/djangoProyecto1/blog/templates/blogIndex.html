@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block page_content %}
+<div class="col-md-8 offset-md-2">
+    <h1>DW2022: Blog</h1>
+    <hr>
+    {% for posteo in posteos %}
+    <h2><a href="{% url 'blogDetail' posteo.pk%}">{{ posteo.titulo }}</a></h2>
+    <small>
+        {{ posteo.created_on.date }} |&nbsp;
+        Categorias:&nbsp;
+        {% for categoria in posteo.categorias.all %}
+        <a href="">
+            {{ categoria.nombre }}
+        </a>&nbsp;
+        {% endfor %}
+    </small>
+    <p>{{ posteo.body | slice:":400" }}...</p>
+    {% endfor %}
+</div>
+{% endblock %}
