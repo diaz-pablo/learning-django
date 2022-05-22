@@ -26,7 +26,7 @@ class Autor(models.Model):
     @property
     def image_preview(self):
         if self.image:
-            return mark_safe('<img src="{}" width="50" height="50" />'.format(self.image.url))
+            return mark_safe('<img src="{}" width="100%" height="50" />'.format(self.image.url))
         return "Sin imagen."
 
     def get_absolute_url(self):
