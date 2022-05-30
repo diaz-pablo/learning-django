@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <h1>Autor: {{ autor }}</h1>
+    {% if autor.image %}
+        <img src="{{ autor.image.url }}" alt="{{ autor }}" class="img-responsive" width="150px">
+    {% else %}
+        <p>Sin imágen del autor.</p>
+    {% endif %}
+    <hr>
+    <p><strong>Fecha de Nacimiento:</strong>
+        {% if autor.fechaNac %}
+            {{ autor.fechaNac }}
+        {% else %}
+            No se registro Fecha de Nacimiento.
+        {% endif %}
+    </p>
+    <p><strong>Fecha de Deceso:</strong>
+        {% if autor.fechaDeceso %}
+            {{ autor.fechaDeceso }}
+        {% else %}
+            No se registro Fecha de Deceso.
+        {% endif %}
+    </p>
+    <hr>
+    <a href="{% url 'autores' %}">Todos los Autores</a>
+{% endblock %}

@@ -23,11 +23,37 @@ class Autor(models.Model):
     fechaDeceso = models.DateField('Fallecido', null=True, blank=True)
     image=models.ImageField(upload_to='images', null=True, blank=True)
 
+    # Preview de la imagen
     @property
     def image_preview(self):
         if self.image:
-            return mark_safe('<img src="{}" width="100%" height="50" />'.format(self.image.url))
+            return mark_safe('<img src="{}" width="50px" height="50px" />'.format(self.image.url))
         return "Sin imagen."
+
+    # Para eliminar imagen cuando se elimina o actualiza
+    def remove_on_image_update(self):
+        try:
+            # is the object in the database yet?
+            obj = Autor.objects.get(id=self.id)
+        except Autor.DoesNotExist:
+            # object is not in db, nothing to worry about
+            return
+        # is the save due to an update of the actual image file?
+        if obj.image and self.image and obj.image != self.image:
+            # delete the old image file from the storage in favor of the new file
+            obj.image.delete()
+
+    # Para eliminar imagen cuando se elimina o actualiza
+    def delete(self, *args, **kwargs):
+        # object is being removed from db, remove the file from storage first
+        self.image.delete()
+        return super(Autor, self).delete(*args, **kwargs)
+
+    # Para eliminar imagen cuando se elimina o actualiza
+    def save(self, *args, **kwargs):
+        # object is possibly being updated, if so, clean up.
+        self.remove_on_image_update()
+        return super(Autor, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
         """
@@ -58,8 +84,33 @@ class Libro(models.Model):
     # La clase Genero ya fue definida, entonces podemos especificar el objeto arriba.
     idioma = models.ForeignKey(Idioma, on_delete=models.SET_NULL, null=True)
     image=models.ImageField(upload_to='images', default='images/default-libro.jpg')
-    preview=models.FileField(upload_to='files', null=True, blank=True)
+    #preview=models.FileField(upload_to='files', null=True, blank=True)
     
+     # Para eliminar imagen cuando se elimina o actualiza
+    def remove_on_image_update(self):
+        try:
+            # is the object in the database yet?
+            obj = Libro.objects.get(id=self.id)
+        except Libro.DoesNotExist:
+            # object is not in db, nothing to worry about
+            return
+        # is the save due to an update of the actual image file?
+        if obj.image and self.image and obj.image != self.image:
+            # delete the old image file from the storage in favor of the new file
+            obj.image.delete()
+
+    # Para eliminar imagen cuando se elimina o actualiza
+    def delete(self, *args, **kwargs):
+        # object is being removed from db, remove the file from storage first
+        self.image.delete()
+        return super(Libro, self).delete(*args, **kwargs)
+        
+    # Para eliminar imagen cuando se elimina o actualiza
+    def save(self, *args, **kwargs):
+        # object is possibly being updated, if so, clean up.
+        self.remove_on_image_update()
+        return super(Libro, self).save(*args, **kwargs)
+
     @property
     def image_preview(self):
         if self.image:
@@ -93,6 +144,9 @@ class Ejemplar(models.Model):
     )
 
     estado = models.CharField(max_length=1, choices=ESTADO_EJEMPLAR, blank=True, default='d', help_text='Disponibilidad del Ejemplar')
+
+    def __str__(self):
+        return str(self.libro)
 
     class Meta:
         ordering = ["fechaDevolucion"]
