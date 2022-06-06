@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from multiprocessing import context
+from django.shortcuts import render, redirect, get_object_or_404
 from catalogo.models import Idioma, Genero, Libro, Ejemplar, Autor
 from django.views import generic
 from django.views.generic.detail import DetailView
@@ -6,6 +7,7 @@ from django.views.generic.list import ListView
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
+from catalogo.forms import GeneroForm, AutorForm
 
 # Create your views here.
 def index(request):
@@ -27,6 +29,46 @@ def index(request):
     }
 
     return render(request, 'index.html',context)
+
+def genero_list(request):
+    generos = Genero.objects.all()
+
+    context = {
+        'generos': generos
+    }
+
+    return render(request, 'genero_list.html', context)
+
+def genero_new(request):
+    if request.method == "POST":
+        formulario = GeneroForm(request.POST)
+
+        if formulario.is_valid():
+            genero = formulario.save(commit=False)
+            genero.nombre = formulario.cleaned_data['nombre']
+            genero.save()
+            
+            return redirect('genero_list')
+    else:
+        formulario = GeneroForm()
+
+    return render(request, 'genero_new.html', {'formulario': formulario})
+
+def genero_update(request, pk):
+    genero = get_object_or_404(Genero, pk=pk)
+    if request.method == "POST":
+        formulario = GeneroForm(request.POST, instance=genero)
+        
+        if formulario.is_valid():
+            genero = formulario.save(commit=False)
+            genero.nombre = formulario.cleaned_data['nombre']
+            genero.save()
+
+            return redirect('genero_list')
+    else:
+        formulario = GeneroForm(instance=genero)
+
+    return render(request, 'genero_new.html', {'formulario': formulario})
 
 # De esta forma podemos mandar mas que datos del libro, podemos mandar datos de las relaciones y ademas se agregó la paginacion que en esta no anda como la anterior
 class LibroListView(ListView):

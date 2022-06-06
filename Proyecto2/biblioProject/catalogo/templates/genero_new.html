@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{%load crispy_forms_tags %}
+
+{% block content %}
+    <h2>Nueva Categoría</h2>
+
+    <form method="POST" class="post-form">
+        {% csrf_token %}
+        {{ formulario|crispy}}
+
+        <button type="submit" class="save btn btn-success">Guardar</button>
+    </form>
+{% endblock %}
