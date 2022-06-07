@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Idiomas</h1>
+
+    <p>
+        <a href="{% url 'idioma_new' %}" class="btn btn-secondary">Nuevo</a>
+    </p>
+    
+    {% if idiomas %}
+        <ul>
+            {% for idioma in idiomas %}
+                <li>
+                    <a href="{% url 'idioma_update' idioma.id %}">{{ idioma.nombre }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Oops! No se crearon Idiomas aun...</p>
+    {% endif %}
+{% endblock %}

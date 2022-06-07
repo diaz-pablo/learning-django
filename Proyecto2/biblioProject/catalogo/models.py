@@ -21,7 +21,8 @@ class Autor(models.Model):
     apellido = models.CharField(max_length=50)
     fechaNac = models.DateField(null=True, blank=True)
     fechaDeceso = models.DateField('Fallecido', null=True, blank=True)
-    image=models.ImageField(upload_to='images', null=True, blank=True)
+    # image=models.ImageField(upload_to='images', null=True, blank=True)
+    image=models.ImageField(upload_to='catalogo/upload/img', null=True)
 
     # Preview de la imagen
     @property
@@ -62,7 +63,10 @@ class Autor(models.Model):
         return reverse('autorInfo', args=[str(self.id)])
 
     def __str__(self):
-        return '%s, %s' % (self.nombre, self.apellido)
+        return '%s, %s' % (self.apellido, self.nombre)
+
+    class Meta:
+        ordering = ["-id", "apellido", "nombre"]
 
 class Idioma(models.Model):
     nombre = models.CharField(max_length=50, help_text="Ingrese el nombre del idioma (xej. Español, Ingles, etc)")

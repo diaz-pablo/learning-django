@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <h2>Nuevo Autor</h2>
+
+    <form method="POST" class="post-form" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+        <table>{{ formulario|crispy}}</table>
+        <button type="submit" class="save btn btn-success">Guardar Autor</button>
+    </form>
+{% endblock %}

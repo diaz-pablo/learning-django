@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
-from catalogo.forms import GeneroForm, AutorForm
+from catalogo.forms import GeneroForm, AutorForm, IdiomaForm
 
 # Create your views here.
 def index(request):
@@ -69,6 +69,47 @@ def genero_update(request, pk):
         formulario = GeneroForm(instance=genero)
 
     return render(request, 'genero_new.html', {'formulario': formulario})
+
+def idioma_list(request):
+    idiomas = Idioma.objects.all()
+
+    context = {
+        'idiomas': idiomas
+    }
+
+    return render(request, 'idioma_list.html', context)
+
+def idioma_new(request):
+    if request.method == "POST":
+        formulario = IdiomaForm(request.POST)
+
+        if formulario.is_valid():
+            idioma = formulario.save(commit=False)
+            idioma.nombre = formulario.cleaned_data['nombre']
+            idioma.save()
+            
+            return redirect('idioma_list')
+    else:
+        formulario = IdiomaForm()
+
+    return render(request, 'idioma_new.html', {'formulario': formulario})
+
+def idioma_update(request, pk):
+    idioma = get_object_or_404(Idioma, pk=pk)
+
+    if request.method == "POST":
+        formulario = IdiomaForm(request.POST, instance=idioma)
+        
+        if formulario.is_valid():
+            idioma = formulario.save(commit=False)
+            idioma.nombre = formulario.cleaned_data['nombre']
+            idioma.save()
+
+            return redirect('idioma_list')
+    else:
+        formulario = IdiomaForm(instance=idioma)
+
+    return render(request, 'idioma_new.html', {'formulario': formulario})
 
 # De esta forma podemos mandar mas que datos del libro, podemos mandar datos de las relaciones y ademas se agregó la paginacion que en esta no anda como la anterior
 class LibroListView(ListView):
@@ -147,3 +188,42 @@ class AutorDetailView(generic.DetailView):
         }
 
         return render(request, 'autor.html',context)
+
+def autor_new(request):
+    if request.method == "POST":
+        formulario = AutorForm(request.POST, request.FILES)
+
+        if formulario.is_valid():
+            autor = formulario.save(commit=False)
+            autor.apellido = formulario.cleaned_data['apellido']
+            autor.nombre = formulario.cleaned_data['nombre']
+            autor.fechaNac = formulario.cleaned_data['fechaNac']
+            autor.fechaDeceso = formulario.cleaned_data['fechaDeceso']
+            autor.image = formulario.cleaned_data['image']
+            autor.save()
+            
+            return redirect('autores')
+    else:
+        formulario = AutorForm()
+
+    return render(request, 'autor_new.html', {'formulario': formulario})
+
+def autor_update(request, pk):
+    autor = get_object_or_404(Autor, pk=pk)
+
+    if request.method == "POST":
+        formulario = AutorForm(request.POST, request.FILES)
+    
+        if formulario.is_valid():
+            autor.apellido = formulario.cleaned_data['apellido']
+            autor.nombre = formulario.cleaned_data['nombre']
+            autor.fechaNac = formulario.cleaned_data['fechaNac']
+            autor.fechaDeceso = formulario.cleaned_data['fechaDeceso']
+            autor.image = formulario.cleaned_data['image']
+            autor.save()
+    
+            return redirect('autores')
+    else:
+        formulario = AutorForm(instance=autor)
+
+    return render(request, 'autor_new.html', {'formulario': formulario})

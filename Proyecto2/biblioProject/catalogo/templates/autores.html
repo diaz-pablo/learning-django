@@ -1,40 +1,48 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Listado</h1>
-{% if autores %}
-<ul>
-    {% for autor in autores %}
-    <li>
-        <a href="{% url 'autor' autor.id %}">{{ autor }}</a> 
-        {% if autor.fechaNac %}
+    <h1>Listado</h1>
+
+    <p>
+        <a href="{% url 'autor_new' %}" class="btn btn-secondary">Nuevo</a>
+    </p>
+
+    {% if autores %}
+    <ul>
+        {% for autor in autores %}
+        <li class="mb-1">
+            <a href="{% url 'autor' autor.id %}">{{ autor }}</a>
+            {% if autor.fechaNac %}
             {{ autor.fechaNac }}
-        {% endif %}
-        
-        {% if autor.fechaDeceso %}
+            {% endif %}
+
+            {% if autor.fechaDeceso %}
             - {{ autor.fechaDeceso }}
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
+            {% endif %}
+
+            <a href="{% url 'autor_update' autor.id %}"><i class="fas fa-edit font-weight-light text-warning"></i></a>
+        </li>
+        {% endfor %}
+    </ul>
 
     {% block pagination %}
-        {% if is_paginated %}
-        <div class="pagination">
-            <span class="page-links">
-                {% if page_obj.has_previous %}
-                <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Anterior</a>
-                {% endif %}
-                <span class="page-current">
-                    Pág. {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
-                </span>
-                {% if page_obj.has_next %}
-                <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">Siguiente</a>
-                {% endif %}
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="page-links">
+            {% if page_obj.has_previous %}
+            <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Anterior</a>
+            {% endif %}
+            <span class="page-current">
+                Pág. {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
             </span>
-        </div>
-        {% endif %}
-    {% endblock %} 
-{% else %}
-<p>Oops! No tenemos autores en catálogo.</p>
-{% endif %}
+            {% if page_obj.has_next %}
+            <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">Siguiente</a>
+            {% endif %}
+        </span>
+    </div>
+    {% endif %}
+    {% endblock %}
+    {% else %}
+    <p>Oops! No tenemos autores en catálogo.</p>
+    {% endif %}
 {% endblock %}
