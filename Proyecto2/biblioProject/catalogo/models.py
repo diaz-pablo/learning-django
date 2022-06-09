@@ -87,7 +87,7 @@ class Libro(models.Model):
     # ManyToManyField, porque un género puede contener muchos libros y un libro puede cubrir varios generos
     # La clase Genero ya fue definida, entonces podemos especificar el objeto arriba.
     idioma = models.ForeignKey(Idioma, on_delete=models.SET_NULL, null=True)
-    image=models.ImageField(upload_to='images', default='images/default-libro.jpg')
+    image=models.ImageField(upload_to='images', default='catalogo/upload/img/default-libro.jpg')
     #preview=models.FileField(upload_to='files', null=True, blank=True)
     
      # Para eliminar imagen cuando se elimina o actualiza

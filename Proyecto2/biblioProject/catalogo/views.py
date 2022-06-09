@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
-from catalogo.forms import GeneroForm, AutorForm, IdiomaForm
+from catalogo.forms import GeneroForm, AutorFormCreate, AutorFormUpdate, IdiomaForm
 
 # Create your views here.
 def index(request):
@@ -191,7 +191,7 @@ class AutorDetailView(generic.DetailView):
 
 def autor_new(request):
     if request.method == "POST":
-        formulario = AutorForm(request.POST, request.FILES)
+        formulario = AutorFormCreate(request.POST, request.FILES)
 
         if formulario.is_valid():
             autor = formulario.save(commit=False)
@@ -204,7 +204,7 @@ def autor_new(request):
             
             return redirect('autores')
     else:
-        formulario = AutorForm()
+        formulario = AutorFormCreate()
 
     return render(request, 'autor_new.html', {'formulario': formulario})
 
@@ -212,7 +212,7 @@ def autor_update(request, pk):
     autor = get_object_or_404(Autor, pk=pk)
 
     if request.method == "POST":
-        formulario = AutorForm(request.POST, request.FILES)
+        formulario = AutorFormUpdate(request.POST, request.FILES)
     
         if formulario.is_valid():
             autor.apellido = formulario.cleaned_data['apellido']
@@ -224,6 +224,9 @@ def autor_update(request, pk):
     
             return redirect('autores')
     else:
-        formulario = AutorForm(instance=autor)
+        formulario = AutorFormUpdate(instance=autor)
 
     return render(request, 'autor_new.html', {'formulario': formulario})
+
+def ejemplar_new(request):
+    pass
