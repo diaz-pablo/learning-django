@@ -20,6 +20,8 @@ urlpatterns = [
     path('idiomas/', views.idioma_list, name='idioma_list'),
     path('idioma/new/', views.idioma_new, name='idioma_new'),
     path('idioma/update/<pk>', views.idioma_update, name='idioma_update'),
+    path('idioma/delete/<pk>', views.idioma_delete, name='idioma_delete'),
 
+    path('ejemplares', views.ejemplar_list, name='ejemplar_list'),
     path('ejemplar/new/', views.ejemplar_new, name='ejemplar_new'),
 ]

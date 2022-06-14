@@ -152,8 +152,8 @@ class Ejemplar(models.Model):
     def __str__(self):
         return str(self.libro)
 
-    class Meta:
-        ordering = ["fechaDevolucion"]
+    def __str__(self):
+        return '%s (%s)' % (self.id,self.libro.titulo)
 
-        def __str__(self):
-            return '%s (%s)' % (self.id,self.libro.titulo)
+    class Meta:
+        ordering = ["libro", "fechaDevolucion"]

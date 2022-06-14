@@ -1,13 +1,52 @@
 {% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-home'></i>" title="Inicio" description="Bienvenidos a <span class='font-italic'>Catálogo</span>, una aplicación web desarrollada en Django." %}
+{% endblock %}
+
 {% block content %}
-<h1>DW2022: Catalogo</h1>
-<p>Bienvenidos a <em>Catalogo</em>, una aplicación web desarrollada en Django.</p>
-<h2>Contenido dinámico</h2>
-<p>Nuestro catálogo se forma de :</p>
-<ul>
-    <li><strong>Autores:</strong> {{ nroAutores }}</li>
-    <li><strong>Libros:</strong> {{ nroLibros }}</li>
-    <li><strong>Ejemplares:</strong> {{ nroEjemplares }}</li>
-    <li><strong>Disponibles:</strong> {{ nroDisponibles }}</li>
-</ul>
+    <h4 class="font-weight-normal mb-4">Nuestro Catálogo se forma de:</h4>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-4 mb-3">
+            <div class="card bg-light">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <div class="bg-primary rounded mb-3 box">
+                        <i class="fas fa-book text-white"></i>
+                    </div>
+
+                    <h2 class="mb-0">Libros</h2>
+                    <p class="lead mb-0" style="font-size: 4rem;">{{ nroLibros }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-md-4 mb-3">
+            <div class="card bg-light">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <div class="bg-primary rounded mb-3 box">
+                        <i class="fas fa-book-reader text-white"></i>
+                    </div>
+
+                    <h2 class="mb-0">Ejemplares</h2>
+                    <p class="lead mb-0" style="font-size: 4rem;">{{ nroEjemplares }}</p>
+
+                    <p>Disponibles: {{ nroDisponibles }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-md-4 mb-3">
+            <div class="card bg-light">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                    <div class="bg-primary rounded mb-3 box">
+                        <i class="fas fa-users text-white"></i>
+                    </div>
+
+                    <h2 class="mb-0">Autores</h2>
+                    <p class="lead mb-0" style="font-size: 4rem;">{{ nroAutores }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

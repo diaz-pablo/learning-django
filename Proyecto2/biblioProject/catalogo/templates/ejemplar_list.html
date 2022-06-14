@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-book-reader'></i>" title="Ejemplares" %}
+{% endblock %}
+
+{% block content %}
+    <h1>Ejemplares</h1>
+
+    <p>
+        <a href="{% url 'ejemplar_new' %}" class="btn btn-secondary">Nuevo</a>
+    </p>
+    
+    {% if ejemplares %}
+        <ul>
+            {% for ejemplar in ejemplares %}
+                <li>
+                    <a href="#">{{ ejemplar.libro }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Oops! No hay Ejemplares en catálogo.</p>
+    {% endif %}
+{% endblock %}

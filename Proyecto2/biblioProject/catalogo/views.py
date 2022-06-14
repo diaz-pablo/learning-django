@@ -7,7 +7,7 @@ from django.views.generic.list import ListView
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
-from catalogo.forms import GeneroForm, AutorFormCreate, AutorFormUpdate, IdiomaForm
+from catalogo.forms import GeneroForm, AutorFormCreate, AutorFormUpdate, IdiomaForm, EjemplarForm
 
 # Create your views here.
 def index(request):
@@ -111,6 +111,11 @@ def idioma_update(request, pk):
 
     return render(request, 'idioma_new.html', {'formulario': formulario})
 
+def idioma_delete(request, pk):
+    idioma = get_object_or_404(Idioma, pk=pk)
+    idioma.delete()
+
+    return redirect('idioma_list')
 # De esta forma podemos mandar mas que datos del libro, podemos mandar datos de las relaciones y ademas se agregó la paginacion que en esta no anda como la anterior
 class LibroListView(ListView):
     model = Libro
@@ -163,7 +168,7 @@ class EjemplarDetailView(generic.DetailView):
 class AutorListView(generic.ListView):
     model = Autor
     context_object_name = 'autores'
-    paginate_by = 3
+    paginate_by = 5
 
     # en este caso va un modelo
     queryset = Autor.objects.all()
@@ -223,10 +228,33 @@ def autor_update(request, pk):
             autor.save()
     
             return redirect('autores')
+        else:
+            return render(request, 'autor_new.html', {'formulario': formulario})
     else:
         formulario = AutorFormUpdate(instance=autor)
 
     return render(request, 'autor_new.html', {'formulario': formulario})
 
+def ejemplar_list(request):
+    ejemplares = Ejemplar.objects.all()
+
+    context = {
+        'ejemplares': ejemplares
+    }
+
+    return render(request, 'ejemplar_list.html', context)
+
 def ejemplar_new(request):
-    pass
+    if request.method == "POST":
+        formulario = EjemplarForm(request.POST)
+
+        if formulario.is_valid():
+            ejemplar = formulario.save(commit=False)
+            ejemplar.fechaDevolucion = formulario.cleaned_data["fechaDevolucion"]
+            ejemplar.save()
+            
+            return redirect('ejemplar_list')
+    else:
+        formulario = EjemplarForm()
+
+    return render(request, 'ejemplar_new.html', {'formulario': formulario})

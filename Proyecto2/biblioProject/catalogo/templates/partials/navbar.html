@@ -1,0 +1,46 @@
+<nav class="navbar navbar-expand-lg  navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}">Catálogo</a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            {% with request.resolver_match.url_name as url_name %}
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item {% if url_name == 'index' %} active {% endif %}">
+                        <a class="nav-link" href="{% url 'index' %}">
+                            <!-- <i class='fas fa-home'></i> -->Inicio <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if url_name == 'autores' %} active {% endif %}">
+                        <a class="nav-link" href="{% url 'autores' %}">
+                            <!-- <i class='fas fa-users'></i> -->Autores <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if url_name == 'libros' %} active {% endif %}">
+                        <a class="nav-link" href="{% url 'libros' %}">
+                            <!-- <i class='fas fa-book'></i> -->Libros <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if url_name == 'ejemplar_list' %} active {% endif %}">
+                        <a class="nav-link" href="{% url 'ejemplar_list' %}">
+                            <!-- <i class='fas fa-book-reader'></i> -->Ejemplares <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if url_name == 'genero_list' %} active {% endif %}">
+                        <a class="nav-link" href="{% url 'genero_list' %}">
+                            <!-- <i class="fas fa-list"></i> -->Géneros <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if url_name == 'idioma_list' %} active {% endif %}">
+                        <a class="nav-link" href="{% url 'idioma_list' %}">
+                            <!-- <i class="fas fa-language"></i> -->Idiomas <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                </ul>
+            {% endwith %}
+        </div>
+    </div>
+</nav>

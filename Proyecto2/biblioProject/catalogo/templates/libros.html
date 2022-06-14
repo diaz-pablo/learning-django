@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-book'></i>" title="Libros" %}
+{% endblock %}
+
 {% block content %}
 <h1>Listado</h1>
 {% if libros %}

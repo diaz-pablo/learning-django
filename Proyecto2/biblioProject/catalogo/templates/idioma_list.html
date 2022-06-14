@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-language'></i>" title="Idiomas" %}
+{% endblock %}
+
 {% block content %}
     <h1>Idiomas</h1>
 
@@ -8,13 +12,30 @@
     </p>
     
     {% if idiomas %}
-        <ul>
+        <table>
+            <tr>
+                <th>Nombre</th>
+                <th></th>
+                <th></th>
+            </tr>
             {% for idioma in idiomas %}
-                <li>
-                    <a href="{% url 'idioma_update' idioma.id %}">{{ idioma.nombre }}</a>
-                </li>
+            <tr>
+                <td>{{ idioma.nombre }}</td>
+                <td>
+                    <a class="btn btn-sm btn-info" href="{% url 'idioma_update' idioma.id %}">Editar</a>
+                </td>
+
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#exampleModal{{ idioma.id }}">
+                        Eliminar
+                    </button>
+
+                    {% include "idioma_modal.html" %}
+                </td>
+                
+            </tr>
             {% endfor %}
-        </ul>
+        </table>
     {% else %}
         <p>Oops! No se crearon Idiomas aun...</p>
     {% endif %}
