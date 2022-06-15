@@ -157,3 +157,8 @@ class Ejemplar(models.Model):
 
     class Meta:
         ordering = ["libro", "fechaDevolucion"]
+
+class POI(models.Model):
+    nombre = models.CharField(max_length=255)
+    lng = models.FloatField()
+    lat = models.FloatField()

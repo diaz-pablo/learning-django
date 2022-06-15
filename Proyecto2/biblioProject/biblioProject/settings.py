@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'catalogo',
     'crispy_forms',
+    # 'django.contrib.gis',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

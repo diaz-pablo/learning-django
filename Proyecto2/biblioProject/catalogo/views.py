@@ -1,6 +1,6 @@
 from multiprocessing import context
 from django.shortcuts import render, redirect, get_object_or_404
-from catalogo.models import Idioma, Genero, Libro, Ejemplar, Autor
+from catalogo.models import Idioma, Genero, Libro, Ejemplar, Autor, POI
 from django.views import generic
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
@@ -8,6 +8,13 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from catalogo.forms import GeneroForm, AutorFormCreate, AutorFormUpdate, IdiomaForm, EjemplarForm
+# para los graficos
+import random
+from random import randint
+# mapas
+import json
+from django.core.serializers import serialize
+from django.views.generic.base import TemplateView
 
 # Create your views here.
 def index(request):
@@ -258,3 +265,45 @@ def ejemplar_new(request):
         formulario = EjemplarForm()
 
     return render(request, 'ejemplar_new.html', {'formulario': formulario})
+
+def ChartData(request):
+    chartLabel = "Préstamos"
+    etiquetas = ['Enero', 'Febrero', 'Marzo','Abril', 'Mayo', 'Junio','Julio','Agosto','Setiembre','Octubre','Noviembre','Diciembre']
+    meses = 12
+    minimo= 10
+    maximo = 100
+    datos = []
+
+    for i in range(meses):
+        datos.append(randint(minimo, maximo))
+
+    context ={
+        "labels": etiquetas,
+        "chartLabel": chartLabel,
+        "data": datos,
+    }
+
+    return render(request, 'charts.html', context)
+
+class POIsMapView(TemplateView):
+    """POIS and map view."""
+    
+    template_name = "map.html"
+
+    def get_context_data(self, **kwargs):
+        """Return the view context data."""
+        context = super().get_context_data(**kwargs)
+        
+        pois = POI.objects.all()
+        lista=[]
+        
+        for poi in pois:
+            json_dict={}
+            json_dict['type'] = 'Feature'
+            json_dict['properties'] = dict(name=poi.nombre)
+            json_dict['geometry'] = dict(type='Point', coordinates=list([poi.lng,poi.lat]))
+            lista.append(json_dict)
+
+        context["markers"]= lista
+        
+        return context

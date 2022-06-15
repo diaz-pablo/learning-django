@@ -24,4 +24,7 @@ urlpatterns = [
 
     path('ejemplares', views.ejemplar_list, name='ejemplar_list'),
     path('ejemplar/new/', views.ejemplar_new, name='ejemplar_new'),
+
+    path('charts/', views.ChartData, name='charts'),
+    path('map/', views.POIsMapView.as_view(), name='map'),
 ]

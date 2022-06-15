@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-chart-area'></i>" title="Gráficos" description="Gráficos con <span class='font-italic'>Chart.js</span>" %}
+{% endblock %}
+
+{% block content %}
+    <div class="col-md-6">
+        <!-- <div id="container" style="width: 100%;"> -->
+            <canvas id="pie-chart"></canvas>
+        <!-- </div> -->
+    </div>
+    <div class="col-md-6">
+        <!-- <div id="container" style="width: 100%;"> -->
+            <canvas id="population-chart"></canvas>
+        <!-- </div> -->
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+    <script>
+        var config = {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: {{ data|safe }},
+                    backgroundColor: [
+                        '#696969', '#808080', '#A9A9A9', '#C0C0C0', '#D3D3D3', '#7D888F','#B9C5CD','#769FB9','#C7874D','#F57E12','#DDE13B','#01CAB0'
+                    ],
+                    labels: {{ labels|safe }} 
+                }],
+                labels: {{ labels|safe }}
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Préstamos Pie Chart'
+                }
+            }
+        };
+
+        window.onload = function() {
+            var ctx = document.getElementById('pie-chart').getContext('2d');
+            window.myPie = new Chart(ctx, config);
+        };
+    </script>
+    <script>
+        //$(function() {
+            var $populationChart = $("#population-chart");
+            $.ajax({
+                url: $populationChart.data("url"),
+                success: function (data) {
+                    var ctx = $populationChart[0].getContext("2d");
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: {{ labels|safe }},
+                            datasets: [{
+                                label: 'Prestamos_',
+                                backgroundColor: '#DDE8EF',
+                                data: {{ data|safe }}
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            legend: {
+                                position: 'top'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Prestamos Bar Chart'
+                            }
+                        }
+                    });
+                }
+            });
+        //});
+    </script>
+{% endblock %}

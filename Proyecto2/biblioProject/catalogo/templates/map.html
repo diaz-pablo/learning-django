@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}">
+{% endblock %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-map-marker-alt'></i>" title="Puntos de Interés" description="Mapa con  <span class='font-italic'>Leaflet</span>" %}
+{% endblock %}
+
+{% block content %}
+    {{ markers|json_script:"markers-data" }}
+    <div id="map" width="100%" style='height:500px'></div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="{% static 'js/map.js' %}"></script>
+{% endblock %}

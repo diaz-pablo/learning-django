@@ -39,6 +39,16 @@
                             <!-- <i class="fas fa-language"></i> -->Idiomas <span class="sr-only">(current)</span>
                         </a>
                     </li>
+                    <li class="nav-item {% if url_name == 'charts' %} active {% endif %}">
+                        <a class="nav-link" href="{% url 'charts' %}">
+                            <!-- <i class="fas fa-language"></i> -->Gráficos <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if url_name == 'map' %} active {% endif %}">
+                        <a class="nav-link" href="{% url 'map' %}">
+                            <!-- <i class="fas fa-language"></i> -->Puntos de Interés <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
                 </ul>
             {% endwith %}
         </div>
