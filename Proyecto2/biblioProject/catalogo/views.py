@@ -171,37 +171,32 @@ class EjemplarDetailView(generic.DetailView):
         context = super(EjemplarDetailView, self).get_context_data(*args, **kwargs)
         return context
 
-# De esta forma solo deja enviar datos del Autor
+""" AUTORES """
 class AutorListView(generic.ListView):
     model = Autor
     context_object_name = 'autores'
     paginate_by = 5
 
-    # en este caso va un modelo
-    queryset = Autor.objects.all()
-    # si quiero filtrar
-    template_name='autores.html'
-    # nombre del template
+    queryset = Autor.objects.order_by('-id')
+    template_name = 'authors/index.html'
 
-# De esta forma solo deja enviar datos del Autor
 class AutorDetailView(generic.DetailView):
     model = Autor
-    template_name = 'autor.html'
-    # es obligatorio el nombre del template
+    template_name = 'authors/show.html'
 
     def autor_detail_view(request,pk):
         try:
             autor=Autor.objects.get(pk=pk)
-        except Autor.DoesNotExist: # PREGUNTAR SOBRE ESTO!
+        except Autor.DoesNotExist:
             raise Http404("Oops! El Autor no existe")
         
         context = {
-            'autor':autor,
+            'autor': autor,
         }
 
-        return render(request, 'autor.html',context)
+        return render(request, 'authors/show.html', context)
 
-def autor_new(request):
+def author_create(request):
     if request.method == "POST":
         formulario = AutorFormCreate(request.POST, request.FILES)
 
@@ -214,13 +209,18 @@ def autor_new(request):
             autor.image = formulario.cleaned_data['image']
             autor.save()
             
-            return redirect('autores')
+            return redirect('authors')
     else:
         formulario = AutorFormCreate()
 
-    return render(request, 'autor_new.html', {'formulario': formulario})
+    context = {
+        'btn_color': 'success',
+        'formulario': formulario
+    }
 
-def autor_update(request, pk):
+    return render(request, 'authors/partials/form.html', context)
+
+def author_update(request, pk):
     autor = get_object_or_404(Autor, pk=pk)
 
     if request.method == "POST":
@@ -234,9 +234,9 @@ def autor_update(request, pk):
             autor.image = formulario.cleaned_data['image']
             autor.save()
     
-            return redirect('autores')
+            return redirect('authors')
         else:
-            return render(request, 'autor_new.html', {'formulario': formulario})
+            return render(request, 'author_create.html', {'formulario': formulario})
     else:
         formulario = AutorFormUpdate(instance=autor)
 

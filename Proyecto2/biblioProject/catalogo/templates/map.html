@@ -12,8 +12,10 @@
 {% endblock %}
 
 {% block content %}
-    {{ markers|json_script:"markers-data" }}
-    <div id="map" width="100%" style='height:500px'></div>
+    <div class="col-sm-12">
+        {{ markers|json_script:"markers-data" }}
+        <div id="map" width="100%" style='height: 500px'></div>
+    </div>
 {% endblock %}
 
 {% block scripts %}

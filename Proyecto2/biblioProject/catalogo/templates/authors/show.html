@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-user'></i>" title="Autor" %}
+{% endblock %}
+
+{% block content %}
+
+    <h1>{{ autor }}</h1>
+    {% if autor.image %}
+        <img src="{{ autor.image.url }}" alt="{{ autor }}" class="img-responsive" width="150px">
+    {% else %}
+        <p class="text-muted mb-0">Sin imágen del autor.</p>
+    {% endif %}
+
+    <hr>
+
+    <p>
+        <strong>Fecha de Nacimiento:</strong>
+        {% if autor.fechaNac %}
+            {{ autor.fechaNac }}
+        {% else %}
+            <span class="text-muted">No se registro la Fecha de Nacimiento.</span>
+        {% endif %}
+    </p>
+    <p>
+        <strong>Fecha de Deceso:</strong>
+        {% if autor.fechaDeceso %}
+            {{ autor.fechaDeceso }}
+        {% else %}
+            <span class="text-muted">No se registro la Fecha de Deceso.</span>
+        {% endif %}
+    </p>
+
+    <hr>
+    
+    <a href="{% url 'authors' %}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Volver al Listado
+    </a>
+{% endblock %}

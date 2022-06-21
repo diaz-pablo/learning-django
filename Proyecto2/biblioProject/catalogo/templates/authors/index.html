@@ -1,23 +1,24 @@
 {% extends "base.html" %}
 
 {% block jumbotron %}
-{% include "partials/jumbotron.html" with icon="<i class='fas fa-users'></i>" title="Autores" %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-users'></i>" title="Autores" %}
 {% endblock %}
 
 {% block content %}
+<div class="row">
     <div class="col-sm-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="font-weight-bold font-italic">Listado</span>
+            <span class="font-weight-bold">LISTADO</span>
             
-            <a href="{% url 'autor_new' %}" class="btn btn-success">
-                <i class="fas fa-plus"></i>
+            <a href="{% url 'author_create' %}" class="btn btn-success">
+                <i class="fas fa-plus"></i> CREAR
             </a>
         </div>
     
-        <div class="card shadow-sm">
-            <div class="card-body table-responsive">
-                {% if autores %}
-                    <table class="table table-hover table-bordered">
+        {% if autores %}
+            <div class="card shadow-sm">
+                <div class="card-body table-responsive rounded-top p-0">
+                    <table class="table table-hover table-bordered table-striped mb-0">
                         <thead class="thead-dark">
                             <tr>
                                 <th scope="col">#</th>
@@ -37,27 +38,29 @@
                                     <td class="text-center">
                                         {% if autor.image %}
                                             <img src="{{  autor.image.url }}" alt="{{ autor }}" class="img-fluid" style="height: 2rem; width: 2rem;">
+                                        {% else %}
+                                            <p class="text-muted font-italic mb-0">Sin foto</p>
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a href="{% url 'autor' autor.id %}">{{ autor }}</a>
+                                        <a href="{% url 'author_details' autor.id %}">{{ autor }}</a>
                                     </td>
                                     <td>
                                         {% if autor.fechaNac %}
                                             {{ autor.fechaNac }}
                                         {% else %}
-                                            -
+                                            <p class="text-muted font-italic mb-0">Sin fecha de Nacimiento</p>
                                         {% endif %}
                                     </td>
                                     <td>
                                         {% if autor.fechaDeceso %}
                                             {{ autor.fechaDeceso }}
                                         {% else %}
-                                            -
+                                            <p class="text-muted font-italic mb-0">Sin fecha de Deceso</p>
                                         {% endif %}
                                     </td>
                                     <td class="text-center">
-                                        <a href="{% url 'autor_update' autor.id %}" class="btn">
+                                        <a href="{% url 'author_update' autor.id %}" class="btn">
                                             <i class="fas fa-edit font-weight-light text-warning"></i>
                                         </a>
                                         
@@ -71,29 +74,33 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                {% else %}        
-                    <p>Oops! No tenemos Autores en Catálogo.</p>
-                {% endif %}
-            </div>
-            <div class="card-footer">
-                {% block pagination %}
-                {% if is_paginated %}
-                <div class="pagination">
-                    <span class="page-links">
-                        {% if page_obj.has_previous %}
-                        <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Anterior</a>
-                        {% endif %}
-                        <span class="page-current">
-                            Pág. {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
-                        </span>
-                        {% if page_obj.has_next %}
-                        <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">Siguiente</a>
-                        {% endif %}
-                    </span>
                 </div>
-                {% endif %}
-            {% endblock %}
+
+                {% block pagination %}
+                    {% if is_paginated %}
+                        <div class="card-footer">
+                            <div class="pagination">
+                                <span class="page-links">
+                                    {% if page_obj.has_previous %}
+                                    <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                    {% endif %}
+                                    <span class="page-current">
+                                        Pág. {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                                    </span>
+                                    {% if page_obj.has_next %}
+                                    <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">Siguiente</a>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endblock %}
             </div>
-        </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                <strong>¡Oops!</strong> No tenemos Autores en Catálogo.
+            </div>
+        {% endif %}
     </div>
+</div>
 {% endblock %}
