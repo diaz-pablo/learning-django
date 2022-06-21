@@ -7,12 +7,13 @@ from django.views.generic.list import ListView
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
-from catalogo.forms import GeneroForm, AutorFormCreate, AutorFormUpdate, IdiomaForm, EjemplarForm
+from django.contrib import messages
+from catalogo.forms import GeneroForm, AutorForm, IdiomaForm, EjemplarForm
 # para los graficos
-import random
+# import random
 from random import randint
 # mapas
-import json
+# import json
 from django.core.serializers import serialize
 from django.views.generic.base import TemplateView
 
@@ -174,7 +175,7 @@ class EjemplarDetailView(generic.DetailView):
 """ AUTORES """
 class AutorListView(generic.ListView):
     model = Autor
-    context_object_name = 'autores'
+    context_object_name = 'authors'
     paginate_by = 5
 
     queryset = Autor.objects.order_by('-id')
@@ -198,49 +199,73 @@ class AutorDetailView(generic.DetailView):
 
 def author_create(request):
     if request.method == "POST":
-        formulario = AutorFormCreate(request.POST, request.FILES)
+        form = AutorForm(request.POST, request.FILES)
 
-        if formulario.is_valid():
-            autor = formulario.save(commit=False)
-            autor.apellido = formulario.cleaned_data['apellido']
-            autor.nombre = formulario.cleaned_data['nombre']
-            autor.fechaNac = formulario.cleaned_data['fechaNac']
-            autor.fechaDeceso = formulario.cleaned_data['fechaDeceso']
-            autor.image = formulario.cleaned_data['image']
-            autor.save()
+        if form.is_valid():
+            author = form.save(commit=False)
+
+            author.apellido = form.cleaned_data['apellido']
+            author.nombre = form.cleaned_data['nombre']
+            author.fechaNac = form.cleaned_data['fechaNac']
+            author.fechaDeceso = form.cleaned_data['fechaDeceso']
+            author.image = form.cleaned_data['image']
             
-            return redirect('authors')
+            author.save()
+
+            messages.success(request, "¡Autor agregado exitosamente!")
+            
+            return redirect('author_list')
     else:
-        formulario = AutorFormCreate()
+        form = AutorForm()
 
     context = {
-        'btn_color': 'success',
-        'formulario': formulario
+        'form': form
     }
 
-    return render(request, 'authors/partials/form.html', context)
+    return render(request, 'authors/create.html', context)
 
 def author_update(request, pk):
-    autor = get_object_or_404(Autor, pk=pk)
+    author = get_object_or_404(Autor, pk=pk)
 
     if request.method == "POST":
-        formulario = AutorFormUpdate(request.POST, request.FILES)
-    
-        if formulario.is_valid():
-            autor.apellido = formulario.cleaned_data['apellido']
-            autor.nombre = formulario.cleaned_data['nombre']
-            autor.fechaNac = formulario.cleaned_data['fechaNac']
-            autor.fechaDeceso = formulario.cleaned_data['fechaDeceso']
-            autor.image = formulario.cleaned_data['image']
-            autor.save()
-    
-            return redirect('authors')
-        else:
-            return render(request, 'author_create.html', {'formulario': formulario})
-    else:
-        formulario = AutorFormUpdate(instance=autor)
+        form = AutorForm(request.POST, request.FILES)
 
-    return render(request, 'autor_new.html', {'formulario': formulario})
+        context = {
+            'form': form
+        }
+    
+        if form.is_valid():
+            author.apellido = form.cleaned_data['apellido']
+            author.nombre = form.cleaned_data['nombre']
+            author.fechaNac = form.cleaned_data['fechaNac']
+            author.fechaDeceso = form.cleaned_data['fechaDeceso']
+            
+            if len(request.FILES) != 0:
+                author.image = form.cleaned_data['image']
+
+            author.save()
+    
+            messages.success(request, "¡Autor actualizado exitosamente!")
+
+            return redirect('author_list')
+        else:
+            return render(request, 'authors/edit.html', context)
+    else:
+        form = AutorForm(instance=author)
+
+        context = {
+            'form': form
+        }
+
+    return render(request, 'authors/edit.html', context)
+
+def author_delete(request, pk):
+    author = get_object_or_404(Autor, pk=pk)
+    author.delete()
+
+    messages.success(request, "¡Autor eliminado exitosamente!")
+
+    return redirect('author_list')
 
 def ejemplar_list(request):
     ejemplares = Ejemplar.objects.all()

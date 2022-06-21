@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-users'></i>" title="Nuevo Autor" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            {% include "authors/partials/form.html"%}
+        </div>
+    </div>
+{% endblock %}

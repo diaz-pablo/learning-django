@@ -6,10 +6,11 @@ urlpatterns = [
     path('libros/', views.LibroListView.as_view(), name='libros'),
     path('libro/<pk>', views.LibroDetailView.as_view(), name='libro'),
     
-    path('autores/', views.AutorListView.as_view(), name='authors'),
+    path('autores/', views.AutorListView.as_view(), name='author_list'),
     path('autor/crear', views.author_create, name='author_create'),
     path('autor/actualizar/<pk>', views.author_update, name='author_update'),
-    path('autor/<pk>', views.AutorDetailView.as_view(), name='author_details'),
+    path('autor/eliminar/<pk>', views.author_delete, name='author_delete'),
+    path('autor/detalle/<pk>', views.AutorDetailView.as_view(), name='author_details'),
     
     path('ejemplar/<pk>', views.EjemplarDetailView.as_view(), name='ejemplar'),
     

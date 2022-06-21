@@ -1,25 +1,18 @@
-{% extends "base.html" %}
-
 {% load crispy_forms_tags %}
 
-{% block jumbotron %}
-    {% include "partials/jumbotron.html" with icon="<i class='fas fa-plus'></i>" title="Nuevo Autor" %}
-{% endblock %}
-
-{% block content %}
-    <div class="row">
-        <div class="col-md-6">
-            <form method="POST" class="card" enctype="multipart/form-data" novalidate>
-                <div class="card-body">
-                    {% csrf_token %}
-                    {{ formulario|crispy}}
-                </div>
-                <div class="card-footer">
-                    <button type="submit" class="btn btn-{{ btn_color }}">
-                        <i class="fas fa-save mr-1"></i> GUARDAR AUTOR
-                    </button>
-                </div>
-            </form>
-        </div>
+<form method="POST" class="card" enctype="multipart/form-data" novalidate>
+    <div class="card-body">
+        {% csrf_token %}
+        {{ form|crispy}}
     </div>
-{% endblock %}
+
+    <div class="card-footer d-flex justify-content-end">
+        <a href="{% url 'author_list' %}" class="btn btn-link">
+            <i class="fas fa-arrow-left mr-1"></i> VOLVER AL LISTADO
+        </a>
+        
+        <button type="submit" class="btn btn-success mr-1">
+            <i class="fas fa-save mr-1"></i> GUARDAR AUTOR
+        </button>
+    </div>
+</form>

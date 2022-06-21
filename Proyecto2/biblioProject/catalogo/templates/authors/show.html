@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block jumbotron %}
-    {% include "partials/jumbotron.html" with icon="<i class='fas fa-user'></i>" title="Autor" %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-users'></i>" title="Autor" %}
 {% endblock %}
 
 {% block content %}
@@ -34,7 +34,7 @@
 
     <hr>
     
-    <a href="{% url 'authors' %}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Volver al Listado
+    <a href="{% url 'author_list' %}" class="btn btn-link">
+        <i class="fas fa-arrow-left mr-1"></i> VOLVER AL LISTADO
     </a>
 {% endblock %}

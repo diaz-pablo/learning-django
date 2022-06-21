@@ -21,8 +21,7 @@ class Autor(models.Model):
     apellido = models.CharField(max_length=50)
     fechaNac = models.DateField(null=True, blank=True)
     fechaDeceso = models.DateField('Fallecido', null=True, blank=True)
-    # image=models.ImageField(upload_to='images', null=True, blank=True)
-    image=models.ImageField(upload_to='catalogo/upload/img', null=True)
+    image=models.ImageField(upload_to='catalogo/upload/img', null=True, blank=True)
 
     # Preview de la imagen
     @property
@@ -148,12 +147,9 @@ class Ejemplar(models.Model):
     )
 
     estado = models.CharField(max_length=1, choices=ESTADO_EJEMPLAR, blank=True, default='d', help_text='Disponibilidad del Ejemplar')
-
+    
     def __str__(self):
-        return str(self.libro)
-
-    def __str__(self):
-        return '%s (%s)' % (self.id,self.libro.titulo)
+        return '%s (%s)' % (self.id, self.libro)
 
     class Meta:
         ordering = ["libro", "fechaDevolucion"]

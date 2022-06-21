@@ -12,17 +12,17 @@ class IdiomaForm(forms.ModelForm):
         model = Idioma
         fields = ('nombre',)
 
-class AutorFormCreate(forms.ModelForm):
-    class Meta:
-        model = Autor
-        fields = ('apellido', 'nombre','fechaNac', 'fechaDeceso', 'image')
+# class AutorFormCreate(forms.ModelForm):
+#     class Meta:
+#         model = Autor
+#         fields = ('apellido', 'nombre','fechaNac', 'fechaDeceso', 'image')
 
-        widgets = {
-            'fechaNac': NumberInput(attrs={'type': 'date'}),
-            'fechaDeceso': NumberInput(attrs={'type': 'date'}),
-        }
+#         widgets = {
+#             'fechaNac': NumberInput(attrs={'type': 'date'}),
+#             'fechaDeceso': NumberInput(attrs={'type': 'date'}),
+#         }
 
-class AutorFormUpdate(forms.ModelForm):
+class AutorForm(forms.ModelForm):
     class Meta:
         model = Autor
         fields = ('apellido', 'nombre','fechaNac', 'fechaDeceso', 'image')
@@ -32,13 +32,13 @@ class AutorFormUpdate(forms.ModelForm):
             'fechaDeceso': NumberInput(attrs={'type': 'date'}),
         }
     
-    def __init__(self, *args, **kwargs):
-        super(self.__class__, self).__init__(*args, **kwargs)
-        # asi vuelves tus campos no requeridos
-        self.fields['image'].required = False
+    # def __init__(self, *args, **kwargs):
+    #     super(self.__class__, self).__init__(*args, **kwargs)
+
+    #     self.fields['image'].required = False
 
     def clean(self):
-        super(AutorFormUpdate, self).clean()
+        super(AutorForm, self).clean()
 
         apellido = self.cleaned_data.get('apellido')
         nombre = self.cleaned_data.get('nombre')
@@ -53,7 +53,7 @@ class AutorFormUpdate(forms.ModelForm):
             if len(nombre) < 5:
                 self._errors['nombre'] = self.error_class(['El nombre debe tener al menos 5 caracteres'])
 
-        if fechaNac!='' and fechaDeceso!='':
+        if fechaNac != None and fechaDeceso != None:
             if fechaDeceso<fechaNac:
                 self._errors['fechaDeceso'] = self.error_class(['La fecha de deceso debe ser mayor  a la de nacimiento'])
     
