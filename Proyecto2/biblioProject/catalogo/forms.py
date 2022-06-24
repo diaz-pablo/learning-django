@@ -1,41 +1,16 @@
 from django import forms
-from catalogo.models import Genero, Autor, Libro, Idioma, Ejemplar
+from catalogo.models import Autor, Libro, Ejemplar, Genero, Idioma
 from django.forms.widgets import NumberInput
 
-class GeneroForm(forms.ModelForm):
-    class Meta:
-        model = Genero
-        fields = ('nombre',)
-
-class IdiomaForm(forms.ModelForm):
-    class Meta:
-        model = Idioma
-        fields = ('nombre',)
-
-# class AutorFormCreate(forms.ModelForm):
-#     class Meta:
-#         model = Autor
-#         fields = ('apellido', 'nombre','fechaNac', 'fechaDeceso', 'image')
-
-#         widgets = {
-#             'fechaNac': NumberInput(attrs={'type': 'date'}),
-#             'fechaDeceso': NumberInput(attrs={'type': 'date'}),
-#         }
-
 class AuthorForm(forms.ModelForm):
-    class Meta:
-        model = Autor
-        fields = ('apellido', 'nombre','fechaNac', 'fechaDeceso', 'image')
+    def __init__(self, *args, **kwargs):
+        super(AuthorForm, self).__init__(*args, **kwargs)
 
-        widgets = {
-            'fechaNac': NumberInput(attrs={'type': 'date'}),
-            'fechaDeceso': NumberInput(attrs={'type': 'date'}),
-        }
-    
-    # def __init__(self, *args, **kwargs):
-    #     super(self.__class__, self).__init__(*args, **kwargs)
-
-    #     self.fields['image'].required = False
+        self.fields['apellido'].label = "Apellido"
+        self.fields['nombre'].label = "Nombre"        
+        self.fields['fechaNac'].label = "Fecha de Nacimiento"
+        self.fields['fechaDeceso'].label = "Fecha de Deceso"       
+        self.fields['image'].label = "Imagen"       
 
     def clean(self):
         super(AuthorForm, self).clean()
@@ -59,22 +34,68 @@ class AuthorForm(forms.ModelForm):
     
         return self.cleaned_data
 
+    class Meta:
+        model = Autor
+        fields = ('apellido', 'nombre','fechaNac', 'fechaDeceso', 'image')
+
+        widgets = {
+            'fechaNac': NumberInput(attrs={'type': 'date'}),
+            'fechaDeceso': NumberInput(attrs={'type': 'date'}),
+        }
+
 class BookForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(BookForm, self).__init__(*args, **kwargs)
+
+        self.fields['titulo'].label = "Título"
+        self.fields['autor'].label = "Autor"
+        self.fields['resumen'].label = "Resumen"
+        self.fields['isbn'].label = "ISBN"
+        self.fields['idioma'].label = "Idioma"
+        self.fields['genero'].label = "Género/s"
+        self.fields['image'].label = "Imagen"
+
     class Meta:
         model = Libro
         fields = ('titulo', 'autor', 'resumen', 'isbn', 'idioma', 'genero', 'image')
 
-    # genders = forms.ModelMultipleChoiceField(queryset=Genero.objects.all())
 
-class EjemplarForm(forms.ModelForm):
+class CopyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(CopyForm, self).__init__(*args, **kwargs)
+
+        self.fields['id'].label = "Id"
+        self.fields['libro'].label = "Libro"
+        self.fields['estado'].label = "Estado"
+        self.fields['fechaDevolucion'].label = "Fecha de Devolución"
+
         self.fields['id'].disabled = True
+        # self.fields['libro'].required = False
 
     class Meta:
         model = Ejemplar
-        fields = ('id', 'libro','estado', 'fechaDevolucion')
+        fields = ('id', 'libro', 'estado', 'fechaDevolucion')
 
         widgets = {
             'fechaDevolucion': NumberInput(attrs={'type': 'date'}),
         }
+
+class GenderForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(GenderForm, self).__init__(*args, **kwargs)
+
+        self.fields['nombre'].label = "Nombre"
+
+    class Meta:
+        model = Genero
+        fields = ('nombre',)
+
+class LanguageForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(LanguageForm, self).__init__(*args, **kwargs)
+
+        self.fields['nombre'].label = "Nombre"
+
+    class Meta:
+        model = Idioma
+        fields = ('nombre',)

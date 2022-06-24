@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block jumbotron %}
-    {% include "partials/jumbotron.html" with icon="<i class='fas fa-book'></i>" title="Libros" %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-list'></i>" title="Géneros" %}
 {% endblock %}
 
 {% block content %}
@@ -10,10 +10,10 @@
 
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <span class="font-weight-bold">LISTADO DE LIBROS</span>
+            <span class="font-weight-bold">LISTADO DE GÉNEROS</span>
 
-            <a href="{% url 'book_create' %}" class="btn btn-success">
-                <i class="fas fa-plus mr-1"></i> NUEVO LIBRO
+            <a href="{% url 'gender_create' %}" class="btn btn-success">
+                <i class="fas fa-plus mr-1"></i> NUEVO GÉNERO
             </a>
         </div>
 
@@ -23,58 +23,37 @@
                     <thead class="thead-dark">
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Imagen</th>
-                            <th scope="col">Título</th>
-                            <th scope="col">Resumen</th>
-                            <th scope="col">Autor</th>
-                            <th scope="col">Género/s</th>
+                            <th scope="col">Nombre</th>
                             <th scope="col" class="text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for book in books %}
+                        {% for gender in genders %}
                         <tr>
                             <th scope="row">
-                                {{ book.id }}
+                                {{ gender.id }}
                             </th>
-                            <td class="text-center">
-                                {% if book.image %}
-                                <img src="{{  book.image.url }}" alt="{{ book }}" class="img-fluid"
-                                    style="height: 2rem; width: 2rem;">
-                                {% else %}
-                                <p class="text-muted font-italic mb-0">Sin imagen</p>
-                                {% endif %}
-                            </td>
                             <td>
-                                <a href="{% url 'book_details' book.id %}">{{ book }}</a>
-                            </td>
-                            <td>
-                                {{ book.resumen|slice:"0:50"  }}...
-                            </td>
-                            <td>
-                                <a href="{% url 'author_details' book.autor.id %}">{{ book.autor }}</a>
-                            </td>
-                            <td>
-                                {{ book.muestra_genero }}
+                                <a href="{% url 'gender_details' gender.id %}">{{ gender.nombre }}</a>
                             </td>
                             <td class="text-center">
                                 <div class="btn-group" role="group" aria-label="Basic example">
-                                    <a href="{% url 'book_update' book.id %}" class="btn btn-warning">
+                                    <a href="{% url 'gender_update' gender.id %}" class="btn btn-warning">
                                         <i class="fas fa-edit font-weight-light mr-1"></i>
                                     </a>
                                     <button type="button" class="btn btn-danger" data-toggle="modal"
-                                    data-target="#book-{{ book.id }}">
+                                    data-target="#gender-{{ gender.id }}">
                                         <i class="fas fa-trash-alt font-weight-light mr-1"></i>
                                     </button>
                                 </div>
 
-                                {% include "books/partials/modal.html" %}
+                                {% include "genders/partials/modal.html" %}
                             </td>
                         </tr>
                         {% empty %}
                             <tr class="bg-red">
                                 <td colspan="7" class="text-center">
-                                    ¡Oops! No tenemos Libros en Catálogo.
+                                    ¡Oops! No tenemos Géneros en Catálogo.
                                 </th>
                             </tr>
                         {% endfor %}

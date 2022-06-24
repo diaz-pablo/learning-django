@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-book-reader'></i>" title="Ejemplar" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12 col-md-8">
+            <h1>{{ ejemplar.libro }}</h1>
+            <img src="{{ ejemplar.libro.image.url }}" alt="{{ ejemplar.libro }}" class="img-responsive" width="200px">
+            
+            <hr>
+            
+            <p>
+                <strong>UUID:</strong>
+                {{ ejemplar.id  }}
+            </p>
+            <p>
+                <strong>Fecha de Devolución:</strong>
+                {% if ejemplar.fechaDevolucion %}
+                    {{ ejemplar.fechaDevolucion }}
+                {% else %}
+                    <span class="text-muted">No se registró la Fecha de Devolución.</span>
+                {% endif %}
+            </p>
+            <p>
+                <strong>Estado:</strong>
+                {{ ejemplar.get_estado_display }}
+            </p>
+
+            <hr>
+            
+            <a href="{% url 'copy_list' %}" class="btn btn-link">
+                <i class="fas fa-arrow-left mr-1"></i> VOLVER AL LISTADO
+            </a>
+        </div>
+    </div>
+{% endblock %}

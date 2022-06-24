@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-book-reader'></i>" title="Nuevo Ejemplar" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12 col-md-8">
+            {% include "copies/partials/form.html" with card_header="Agregar un nuevo Ejemplar" %}
+        </div>
+    </div>
+{% endblock %}

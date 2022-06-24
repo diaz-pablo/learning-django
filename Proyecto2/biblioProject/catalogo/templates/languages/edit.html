@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-language'></i>" title="Editar Idioma" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12 col-md-8">
+            {% include "languages/partials/form.html" with card_header="Editar Idioma" %}
+        </div>
+    </div>
+{% endblock %}

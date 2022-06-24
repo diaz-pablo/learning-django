@@ -9,12 +9,9 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.contrib import messages
-from catalogo.forms import GeneroForm, AuthorForm, BookForm, IdiomaForm, EjemplarForm
+from catalogo.forms import AuthorForm, BookForm, CopyForm, GenderForm, LanguageForm
 from random import randint
 from django.views.generic.base import TemplateView
-
-# Create your views here.
-
 
 def index(request):
     nroGeneros = Genero.objects.all().count()
@@ -23,7 +20,6 @@ def index(request):
     nroLibros = Libro.objects.all().count()
     nroEjemplares = Ejemplar.objects.all().count()
     nroDisponibles = Ejemplar.objects.filter(estado__exact='d').count()
-    # El 'all()' esta implícito por defecto.
     nroAutores = Autor.objects.count()
 
     context = {
@@ -37,227 +33,15 @@ def index(request):
 
     return render(request, 'index.html', context)
 
-
-def genero_list(request):
-    generos = Genero.objects.all()
-
-    context = {
-        'generos': generos
-    }
-
-    return render(request, 'genero_list.html', context)
-
-
-def genero_new(request):
-    if request.method == "POST":
-        formulario = GeneroForm(request.POST)
-
-        if formulario.is_valid():
-            genero = formulario.save(commit=False)
-            genero.nombre = formulario.cleaned_data['nombre']
-            genero.save()
-
-            return redirect('genero_list')
-    else:
-        formulario = GeneroForm()
-
-    return render(request, 'genero_new.html', {'formulario': formulario})
-
-
-def genero_update(request, pk):
-    genero = get_object_or_404(Genero, pk=pk)
-    if request.method == "POST":
-        formulario = GeneroForm(request.POST, instance=genero)
-
-        if formulario.is_valid():
-            genero = formulario.save(commit=False)
-            genero.nombre = formulario.cleaned_data['nombre']
-            genero.save()
-
-            return redirect('genero_list')
-    else:
-        formulario = GeneroForm(instance=genero)
-
-    return render(request, 'genero_new.html', {'formulario': formulario})
-
-
-def idioma_list(request):
-    idiomas = Idioma.objects.all()
-
-    context = {
-        'idiomas': idiomas
-    }
-
-    return render(request, 'idioma_list.html', context)
-
-
-def idioma_new(request):
-    if request.method == "POST":
-        formulario = IdiomaForm(request.POST)
-
-        if formulario.is_valid():
-            idioma = formulario.save(commit=False)
-            idioma.nombre = formulario.cleaned_data['nombre']
-            idioma.save()
-
-            return redirect('idioma_list')
-    else:
-        formulario = IdiomaForm()
-
-    return render(request, 'idioma_new.html', {'formulario': formulario})
-
-
-def idioma_update(request, pk):
-    idioma = get_object_or_404(Idioma, pk=pk)
-
-    if request.method == "POST":
-        formulario = IdiomaForm(request.POST, instance=idioma)
-
-        if formulario.is_valid():
-            idioma = formulario.save(commit=False)
-            idioma.nombre = formulario.cleaned_data['nombre']
-            idioma.save()
-
-            return redirect('idioma_list')
-    else:
-        formulario = IdiomaForm(instance=idioma)
-
-    return render(request, 'idioma_new.html', {'formulario': formulario})
-
-
-def idioma_delete(request, pk):
-    idioma = get_object_or_404(Idioma, pk=pk)
-    idioma.delete()
-
-    return redirect('idioma_list')
-
-
-""" LIBROS """
-
-
-class BookListView(ListView):
-    model = Libro
-    template_name = 'books/index.html'
-    paginate_by = 5
-
-    def get_context_data(self, **kwargs):
-        books = Libro.objects.order_by('-id')
-        context = super(BookListView, self).get_context_data(**kwargs)
-        paginator = Paginator(books, self.paginate_by)
-
-        page = self.request.GET.get('page')
-
-        try:
-            books = paginator.page(page)
-        except PageNotAnInteger:
-            books = paginator.page(1)
-        except EmptyPage:
-            books = paginator.page(paginator.num_pages)
-
-        context['books'] = books
-
-        return context
-
-
-class BookDetailView(DetailView):
-    model = Libro
-    template_name = 'books/show.html'
-
-    def get_context_data(self, *args, **kwargs):
-        book = Libro.objects.get(pk=self.kwargs['pk'])
-        context = super(BookDetailView, self).get_context_data(*args, **kwargs)
-
-        copies = Ejemplar.objects.filter(libro__pk=book.pk).order_by('estado')
-
-        context["copies"] = copies
-        context["copy_by_status"] = copies.values(
-            'estado').annotate(total=Count('estado'))
-
-        return context
-
-def book_create(request):
-    if request.method == "POST":
-        form = BookForm(request.POST, request.FILES)
-
-        if form.is_valid():
-            book = form.save(commit=False)
-
-            book.titulo = form.cleaned_data['titulo']
-            book.autor = form.cleaned_data['autor']
-            book.resumen = form.cleaned_data['resumen']
-            book.isbn = form.cleaned_data['isbn']
-            # book.genero = [1, 2, 3] #form.cleaned_data['genders']
-            book.idioma = form.cleaned_data['idioma']
-            book.image = form.cleaned_data['image']
-            book.save()
-
-            genders_id = []
-            for gender in form.cleaned_data['genero']:
-                genders_id.append(gender.id)
-            
-            for x in genders_id:
-                book.genero.add(Genero.objects.get(id=x))
-
-            print(genders_id)
-
-            messages.success(request, "Libro agregado exitosamente!")
-
-            return redirect('book_list')
-    else:
-        form = BookForm()
-
-    context = {
-        'form': form
-    }
-
-    return render(request, 'books/create.html', context)
-
-def book_delete(request, pk):
-    book = get_object_or_404(Libro, pk=pk)
-    book.delete()
-
-    messages.success(request, "¡Libro eliminado exitosamente!")
-
-    return redirect('book_list')
-
-
-class LibroDetailView(DetailView):
-    # specify the model to use
-    model = Libro
-    template_name = 'libro.html'
-
-    # override context data
-    def get_context_data(self, *args, **kwargs):
-        libro = Libro.objects.get(pk=self.kwargs['pk'])
-        context = super(LibroDetailView, self).get_context_data(
-            *args, **kwargs)
-        # add extra field
-        context["ejemplares"] = Ejemplar.objects.filter(libro__pk=libro.pk)
-        return context
-
-
-class EjemplarDetailView(generic.DetailView):
-    model = Ejemplar
-    template_name = 'ejemplar.html'
-
-    # override context data
-    def get_context_data(self, *args, **kwargs):
-        context = super(EjemplarDetailView, self).get_context_data(
-            *args, **kwargs)
-        return context
-
-
 """ AUTORES """
-
-
 class AuthorListView(generic.ListView):
     model = Autor
     context_object_name = 'authors'
     paginate_by = 5
+    # context_object_name = 'authors'
 
     queryset = Autor.objects.order_by('-id')
     template_name = 'authors/index.html'
-
 
 class AuthorDetailView(generic.DetailView):
     model = Autor
@@ -274,7 +58,6 @@ class AuthorDetailView(generic.DetailView):
         }
 
         return render(request, 'authors/show.html', context)
-
 
 def author_create(request):
     if request.method == "POST":
@@ -303,12 +86,11 @@ def author_create(request):
 
     return render(request, 'authors/create.html', context)
 
-
 def author_update(request, pk):
     author = get_object_or_404(Autor, pk=pk)
 
     if request.method == "POST":
-        form = AuthorForm(request.POST, request.FILES)
+        form = AuthorForm(request.POST, request.FILES, instance=author)
 
         context = {
             'form': form
@@ -339,7 +121,6 @@ def author_update(request, pk):
 
     return render(request, 'authors/edit.html', context)
 
-
 def author_delete(request, pk):
     author = get_object_or_404(Autor, pk=pk)
     author.delete()
@@ -348,32 +129,472 @@ def author_delete(request, pk):
 
     return redirect('author_list')
 
+""" LIBROS """
+class BookListView(ListView):
+    model = Libro
+    template_name = 'books/index.html'
+    paginate_by = 5
+    # context_object_name = 'books'
 
-def ejemplar_list(request):
-    ejemplares = Ejemplar.objects.all()
+    def get_context_data(self, **kwargs):
+        books = Libro.objects.order_by('-id')
+        context = super(BookListView, self).get_context_data(**kwargs)
+        paginator = Paginator(books, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            books = paginator.page(page)
+        except PageNotAnInteger:
+            books = paginator.page(1)
+        except EmptyPage:
+            books = paginator.page(paginator.num_pages)
+
+        context['books'] = books
+
+        return context
+
+class BookDetailView(DetailView):
+    model = Libro
+    template_name = 'books/show.html'
+
+    def get_context_data(self, *args, **kwargs):
+        book = Libro.objects.get(pk=self.kwargs['pk'])
+        context = super(BookDetailView, self).get_context_data(*args, **kwargs)
+
+        copies = Ejemplar.objects.filter(libro__pk=book.pk).order_by('estado')
+
+        context["copies"] = copies
+        context["copy_by_status"] = copies.values('estado').annotate(total=Count('estado'))
+
+        return context
+
+def book_create(request):
+    if request.method == "POST":
+        form = BookForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            book = form.save(commit=False)
+
+            book.titulo = form.cleaned_data['titulo']
+            book.autor = form.cleaned_data['autor']
+            book.resumen = form.cleaned_data['resumen']
+            book.isbn = form.cleaned_data['isbn']
+            book.idioma = form.cleaned_data['idioma']
+            book.image = form.cleaned_data['image']
+            book.save()
+
+            for gender in form.cleaned_data['genero']:
+                book.genero.add(gender)
+
+            messages.success(request, "¡Libro agregado exitosamente!")
+
+            return redirect('book_list')
+    else:
+        form = BookForm()
 
     context = {
-        'ejemplares': ejemplares
+        'form': form
     }
 
-    return render(request, 'ejemplar_list.html', context)
+    return render(request, 'books/create.html', context)
 
+def book_update(request, pk):
+    book = get_object_or_404(Libro, pk=pk)
 
-def ejemplar_new(request):
     if request.method == "POST":
-        formulario = EjemplarForm(request.POST)
+        form = BookForm(request.POST, request.FILES, instance=book)
 
-        if formulario.is_valid():
-            ejemplar = formulario.save(commit=False)
-            ejemplar.fechaDevolucion = formulario.cleaned_data["fechaDevolucion"]
-            ejemplar.save()
+        if form.is_valid():
+            book = form.save(commit=False)
 
-            return redirect('ejemplar_list')
+            book.titulo = form.cleaned_data['titulo']
+            book.autor = form.cleaned_data['autor']
+            book.resumen = form.cleaned_data['resumen']
+            book.isbn = form.cleaned_data['isbn']
+            book.idioma = form.cleaned_data['idioma']
+
+            if len(request.FILES) != 0:
+                book.image = form.cleaned_data['image']
+
+            book.genero.clear()
+
+            book.save()
+
+            for gender in form.cleaned_data['genero']:
+                book.genero.add(gender)
+
+            messages.success(request, "¡Autor actualizado exitosamente!")
+
+            return redirect('book_list')
+        else:
+            context = {
+                'form': form
+            }
+
+            return render(request, 'books/edit.html', context)
     else:
-        formulario = EjemplarForm()
+        form = BookForm(instance=book)
 
-    return render(request, 'ejemplar_new.html', {'formulario': formulario})
+        context = {
+            'form': form
+        }
 
+    return render(request, 'books/edit.html', context)
+
+def book_delete(request, pk):
+    book = get_object_or_404(Libro, pk=pk)
+    book.delete()
+
+    messages.success(request, "¡Libro eliminado exitosamente!")
+
+    return redirect('book_list')
+
+""" EJEMPLARES """
+class CopyListView(ListView):
+    model = Ejemplar
+    template_name = 'copies/index.html'
+    paginate_by = 5
+    # context_object_name = 'copies'
+
+    def get_context_data(self, **kwargs):
+        copies = Ejemplar.objects.order_by('-id')
+        context = super(CopyListView, self).get_context_data(**kwargs)
+        paginator = Paginator(copies, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            copies = paginator.page(page)
+        except PageNotAnInteger:
+            copies = paginator.page(1)
+        except EmptyPage:
+            copies = paginator.page(paginator.num_pages)
+
+        context['copies'] = copies
+
+        return context
+
+class CopyDetailView(DetailView):
+    model = Ejemplar
+    template_name = 'copies/show.html'
+
+    def get_context_data(self, *args, **kwargs):
+        copy = Ejemplar.objects.get(pk=self.kwargs['pk'])
+        context = super(CopyDetailView, self).get_context_data(*args, **kwargs)
+        
+        return context
+
+def copy_create(request):
+    if request.method == "POST":
+        form = CopyForm(request.POST)
+
+        if form.is_valid():
+            copy = form.save(commit=False)
+
+            copy.libro = form.cleaned_data['libro']
+            copy.fechaDevolucion = form.cleaned_data['fechaDevolucion']
+            copy.estado = form.cleaned_data['estado']
+            
+            copy.save()
+
+            messages.success(request, "Ejemplar agregado exitosamente!")
+
+            return redirect('copy_list')
+    else:
+        form = CopyForm()
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'copies/create.html', context)
+
+def copy_update(request, pk):
+    copy = get_object_or_404(Ejemplar, pk=pk)
+
+    if request.method == "POST":
+        form = CopyForm(request.POST, instance=copy)
+
+        if form.is_valid():
+            copy = form.save(commit=False)
+
+            copy.libro = form.cleaned_data['libro']
+            copy.fechaDevolucion = form.cleaned_data['fechaDevolucion']
+            copy.estado = form.cleaned_data['estado']
+
+            copy.save()
+
+            messages.success(request, "¡Ejemplar actualizado exitosamente!")
+
+            return redirect('copy_list')
+        else:
+            context = {
+                'form': form
+            }
+
+            return render(request, 'copies/edit.html', context)
+    else:
+        form = CopyForm(instance=copy)
+
+        context = {
+            'form': form
+        }
+
+    return render(request, 'copies/edit.html', context)
+
+def copy_delete(request, pk):
+    copy = get_object_or_404(Ejemplar, pk=pk)
+    copy.delete()
+
+    messages.success(request, "¡Ejemplar eliminado exitosamente!")
+
+    return redirect('copy_list')
+
+""" GÉNEROS """
+class GenderListView(ListView):
+    model = Genero
+    template_name = 'genders/index.html'
+    paginate_by = 5
+    # context_object_name = 'genders'
+
+    def get_context_data(self, **kwargs):
+        genders = Genero.objects.order_by('-id')
+        context = super(GenderListView, self).get_context_data(**kwargs)
+        paginator = Paginator(genders, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            genders = paginator.page(page)
+        except PageNotAnInteger:
+            genders = paginator.page(1)
+        except EmptyPage:
+            genders = paginator.page(paginator.num_pages)
+
+        context['genders'] = genders
+
+        return context
+
+class GenderDetailView(DetailView):
+    model = Genero
+    template_name = 'genders/show.html'
+
+    def get_context_data(self, *args, **kwargs):
+        gender = Genero.objects.get(pk=self.kwargs['pk'])
+        context = super(GenderDetailView, self).get_context_data(*args, **kwargs)
+        
+        return context
+
+def gender_create(request):
+    if request.method == "POST":
+        form = GenderForm(request.POST)
+
+        if form.is_valid():
+            gender = form.save(commit=False)
+
+            gender.nombre = form.cleaned_data['nombre']
+            
+            gender.save()
+
+            messages.success(request, "¡Género agregado exitosamente!")
+
+            return redirect('gender_list')
+    else:
+        form = GenderForm()
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'genders/create.html', context)
+
+def gender_update(request, pk):
+    gender = get_object_or_404(Genero, pk=pk)
+
+    if request.method == "POST":
+        form = GenderForm(request.POST, instance=gender)
+
+        if form.is_valid():
+            gender = form.save(commit=False)
+
+            gender.nombre = form.cleaned_data['nombre']
+
+            gender.save()
+
+            messages.success(request, "¡Género actualizado exitosamente!")
+
+            return redirect('gender_list')
+        else:
+            context = {
+                'form': form
+            }
+
+            return render(request, 'genders/edit.html', context)
+    else:
+        form = GenderForm(instance=gender)
+
+        context = {
+            'form': form
+        }
+
+    return render(request, 'genders/edit.html', context)
+
+def gender_delete(request, pk):
+    gender = get_object_or_404(Genero, pk=pk)
+    gender.delete()
+
+    messages.success(request, "¡Género eliminado exitosamente!")
+
+    return redirect('gender_list')
+
+""" IDIOMAS """
+class LanguageListView(ListView):
+    model = Idioma
+    template_name = 'languages/index.html'
+    paginate_by = 5
+    # context_object_name = 'languages'
+
+    def get_context_data(self, **kwargs):
+        languages = Idioma.objects.order_by('-id')
+        context = super(LanguageListView, self).get_context_data(**kwargs)
+        paginator = Paginator(languages, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            languages = paginator.page(page)
+        except PageNotAnInteger:
+            languages = paginator.page(1)
+        except EmptyPage:
+            languages = paginator.page(paginator.num_pages)
+
+        context['languages'] = languages
+
+        return context
+
+class LanguageDetailView(DetailView):
+    model = Idioma
+    template_name = 'languages/show.html'
+
+    def get_context_data(self, *args, **kwargs):
+        language = Idioma.objects.get(pk=self.kwargs['pk'])
+        context = super(LanguageDetailView, self).get_context_data(*args, **kwargs)
+        
+        return context
+
+def language_create(request):
+    if request.method == "POST":
+        form = LanguageForm(request.POST)
+
+        if form.is_valid():
+            language = form.save(commit=False)
+
+            language.nombre = form.cleaned_data['nombre']
+            
+            language.save()
+
+            messages.success(request, "¡Idioma agregado exitosamente!")
+
+            return redirect('language_list')
+    else:
+        form = LanguageForm()
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'languages/create.html', context)
+
+def language_update(request, pk):
+    language = get_object_or_404(Idioma, pk=pk)
+
+    if request.method == "POST":
+        form = LanguageForm(request.POST, instance=language)
+
+        if form.is_valid():
+            language = form.save(commit=False)
+
+            language.nombre = form.cleaned_data['nombre']
+
+            language.save()
+
+            messages.success(request, "¡Idioma actualizado exitosamente!")
+
+            return redirect('language_list')
+        else:
+            context = {
+                'form': form
+            }
+
+            return render(request, 'languages/edit.html', context)
+    else:
+        form = LanguageForm(instance=language)
+
+        context = {
+            'form': form
+        }
+
+    return render(request, 'languages/edit.html', context)
+
+def language_delete(request, pk):
+    language = get_object_or_404(Idioma, pk=pk)
+    language.delete()
+
+    messages.success(request, "¡Idioma eliminado exitosamente!")
+
+    return redirect('language_list')
+
+
+# def idioma_list(request):
+#     idiomas = Idioma.objects.all()
+
+#     context = {
+#         'idiomas': idiomas
+#     }
+
+#     return render(request, 'idioma_list.html', context)
+
+
+# def idioma_new(request):
+#     if request.method == "POST":
+#         formulario = IdiomaForm(request.POST)
+
+#         if formulario.is_valid():
+#             idioma = formulario.save(commit=False)
+#             idioma.nombre = formulario.cleaned_data['nombre']
+#             idioma.save()
+
+#             return redirect('idioma_list')
+#     else:
+#         formulario = IdiomaForm()
+
+#     return render(request, 'idioma_new.html', {'formulario': formulario})
+
+
+# def idioma_update(request, pk):
+#     idioma = get_object_or_404(Idioma, pk=pk)
+
+#     if request.method == "POST":
+#         formulario = IdiomaForm(request.POST, instance=idioma)
+
+#         if formulario.is_valid():
+#             idioma = formulario.save(commit=False)
+#             idioma.nombre = formulario.cleaned_data['nombre']
+#             idioma.save()
+
+#             return redirect('idioma_list')
+#     else:
+#         formulario = IdiomaForm(instance=idioma)
+
+#     return render(request, 'idioma_new.html', {'formulario': formulario})
+
+
+# def idioma_delete(request, pk):
+#     idioma = get_object_or_404(Idioma, pk=pk)
+#     idioma.delete()
+
+#     return redirect('idioma_list')
 
 def ChartData(request):
     chartLabel = "Préstamos"

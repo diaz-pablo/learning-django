@@ -1,6 +1,9 @@
 {% load crispy_forms_tags %}
 
 <form method="POST" class="card" enctype="multipart/form-data" novalidate>
+    <div class="card-header">
+        {{ card_header|upper }}
+    </div>
     <div class="card-body">
         {% csrf_token %}
         {{ form|crispy}}

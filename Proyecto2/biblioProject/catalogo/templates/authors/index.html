@@ -41,7 +41,7 @@
                                     <img src="{{  author.image.url }}" alt="{{ author }}" class="img-fluid"
                                         style="height: 2rem; width: 2rem;">
                                     {% else %}
-                                    <p class="text-muted font-italic mb-0">Sin foto</p>
+                                    <p class="text-muted mb-0">Sin foto</p>
                                     {% endif %}
                                 </td>
                                 <td>
@@ -51,14 +51,14 @@
                                     {% if author.fechaNac %}
                                     {{ author.fechaNac }}
                                     {% else %}
-                                    <p class="text-muted font-italic mb-0">Sin fecha de Nacimiento</p>
+                                    <p class="text-muted mb-0">No se registró Fecha de Nacimiento</p>
                                     {% endif %}
                                 </td>
                                 <td>
                                     {% if author.fechaDeceso %}
                                         {{ author.fechaDeceso }}
                                     {% else %}
-                                        <p class="text-muted font-italic mb-0">Sin fecha de Deceso</p>
+                                        <p class="text-muted mb-0">No se registró Fecha de Deceso</p>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">

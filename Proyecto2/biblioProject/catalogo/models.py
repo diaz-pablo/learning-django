@@ -52,7 +52,7 @@ class Autor(models.Model):
         """
         Devuelve la url para acceder a un autor.
         """
-        return reverse('autorInfo', args=[str(self.id)])
+        return reverse('author-details', args=[str(self.id)])
 
     def __str__(self):
         return '%s, %s' % (self.apellido, self.nombre)
@@ -67,20 +67,13 @@ class Idioma(models.Model):
         return self.nombre
 
 class Libro(models.Model):
-    """
-    Modelo que representa un libro (no un Ejemplar)
-    """
     titulo = models.CharField(max_length=200)
     autor = models.ForeignKey(Autor, on_delete=models.SET_NULL, null=True)
-    # ForeignKey, ya que un libro tiene un solo autor, pero el mismo autor puede haber escrito muchos libros.
     resumen = models.TextField(max_length=1000, help_text="Ingrese un resumen del libro")
-    isbn = models.CharField('ISBN',max_length=13, help_text='13 Caracteres <a href="https://www.isbninternational.org/content/what-isbn">ISBN number</a>')
-    genero = models.ManyToManyField(Genero, help_text="Seleccione un genero (o varios) para el libro")
-    # ManyToManyField, porque un género puede contener muchos libros y un libro puede cubrir varios generos
-    # La clase Genero ya fue definida, entonces podemos especificar el objeto arriba.
+    isbn = models.CharField('ISBN',max_length=13, help_text='13 Caracteres (<a href="https://www.isbninternational.org/content/what-isbn">ISBN number</a>)')
+    genero = models.ManyToManyField(Genero, help_text="Seleccione un género (o varios) para el libro")
     idioma = models.ForeignKey(Idioma, on_delete=models.SET_NULL, null=True)
     image=models.ImageField(upload_to='images', default='catalogo/upload/img/default-libro.jpg')
-    #preview=models.FileField(upload_to='files', null=True, blank=True)
     
      # Para eliminar imagen cuando se elimina o actualiza
     def remove_on_image_update(self):
@@ -114,21 +107,19 @@ class Libro(models.Model):
         return "Sin imagen."
 
     def muestra_genero(self):
-        return ', '.join([genero.nombre for genero in self.genero.all()[:3]])
+        return ', '.join([genero.nombre for genero in self.genero.all()])
+        # return ', '.join([genero.nombre for genero in self.genero.all()[:3]])
         
     muestra_genero.short_description = 'Género/s'
 
     def get_absolute_url(self):
-        return reverse('LibroInfo', args=[str(self.id)])
+        return reverse('book-details', args=[str(self.id)])
  
     def __str__(self):
         return self.titulo
 
 class Ejemplar(models.Model):
-    """
-    Modelo que representa un ejemplar de un libro.
-    """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="ID unico para este libro particular en toda la biblioteca")
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="ID único para este libro particular en toda la biblioteca")
     libro = models.ForeignKey(Libro, on_delete=models.SET_NULL, null=True)
     fechaDevolucion = models.DateField(null=True, blank=True)
 
@@ -139,14 +130,13 @@ class Ejemplar(models.Model):
         ('r', 'Reservado'),
     )
 
-    estado = models.CharField(max_length=1, choices=ESTADO_EJEMPLAR, blank=True, default='d', help_text='Disponibilidad del Ejemplar')
+    estado = models.CharField(max_length=1, choices=ESTADO_EJEMPLAR, default='d', help_text='Disponibilidad del Ejemplar')
     
     def __str__(self):
-        return '%s (%s)' % (self.id, self.libro)
+        return '%s (%s)' % (self.libro, self.id)
 
     class Meta:
-        # ordering = ["libro", "fechaDevolucion"]
-        ordering = ['-id']
+        ordering = ['libro', 'fechaDevolucion']
 
 class POI(models.Model):
     nombre = models.CharField(max_length=255)
