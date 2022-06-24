@@ -3,14 +3,20 @@ from catalogo import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('libros/', views.LibroListView.as_view(), name='libros'),
-    path('libro/<pk>', views.LibroDetailView.as_view(), name='libro'),
+    # path('libros/', views.LibroListView.as_view(), name='libros'),
+    # path('libro/<pk>', views.LibroDetailView.as_view(), name='libro'),
     
-    path('autores/', views.AutorListView.as_view(), name='author_list'),
+    path('libros/', views.BookListView.as_view(), name='book_list'),
+    path('libro/crear', views.book_create, name='book_create'),
+    # path('libro/actualizar/<pk>', views.book_update, name='book_update'),
+    path('libro/eliminar/<pk>', views.book_delete, name='book_delete'),
+    path('libro/detalle/<pk>', views.BookDetailView.as_view(), name='book_details'),
+
+    path('autores/', views.AuthorListView.as_view(), name='author_list'),
     path('autor/crear', views.author_create, name='author_create'),
     path('autor/actualizar/<pk>', views.author_update, name='author_update'),
     path('autor/eliminar/<pk>', views.author_delete, name='author_delete'),
-    path('autor/detalle/<pk>', views.AutorDetailView.as_view(), name='author_details'),
+    path('autor/detalle/<pk>', views.AuthorDetailView.as_view(), name='author_details'),
     
     path('ejemplar/<pk>', views.EjemplarDetailView.as_view(), name='ejemplar'),
     

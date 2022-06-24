@@ -1,0 +1,18 @@
+{% load crispy_forms_tags %}
+
+<form method="POST" class="card" enctype="multipart/form-data" novalidate>
+    <div class="card-body">
+        {% csrf_token %}
+        {{ form|crispy}}
+    </div>
+
+    <div class="card-footer d-flex justify-content-end">
+        <a href="{% url 'book_list' %}" class="btn btn-link">
+            <i class="fas fa-arrow-left mr-1"></i> VOLVER AL LISTADO
+        </a>
+        
+        <button type="submit" class="btn btn-success mr-1">
+            <i class="fas fa-save mr-1"></i> GUARDAR LIBRO
+        </button>
+    </div>
+</form>

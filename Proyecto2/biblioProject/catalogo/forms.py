@@ -1,5 +1,5 @@
 from django import forms
-from catalogo.models import Genero, Autor, Idioma, Ejemplar
+from catalogo.models import Genero, Autor, Libro, Idioma, Ejemplar
 from django.forms.widgets import NumberInput
 
 class GeneroForm(forms.ModelForm):
@@ -22,7 +22,7 @@ class IdiomaForm(forms.ModelForm):
 #             'fechaDeceso': NumberInput(attrs={'type': 'date'}),
 #         }
 
-class AutorForm(forms.ModelForm):
+class AuthorForm(forms.ModelForm):
     class Meta:
         model = Autor
         fields = ('apellido', 'nombre','fechaNac', 'fechaDeceso', 'image')
@@ -38,7 +38,7 @@ class AutorForm(forms.ModelForm):
     #     self.fields['image'].required = False
 
     def clean(self):
-        super(AutorForm, self).clean()
+        super(AuthorForm, self).clean()
 
         apellido = self.cleaned_data.get('apellido')
         nombre = self.cleaned_data.get('nombre')
@@ -59,23 +59,17 @@ class AutorForm(forms.ModelForm):
     
         return self.cleaned_data
 
-# ESTADO_EJEMPLAR = (
-#     ('m', 'en Mantenimiento'),
-#     ('p', 'Prestado'),
-#     ('d', 'Disponible'),
-#     ('r', 'Reservado'),
-# )
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Libro
+        fields = ('titulo', 'autor', 'resumen', 'isbn', 'idioma', 'genero', 'image')
+
+    # genders = forms.ModelMultipleChoiceField(queryset=Genero.objects.all())
 
 class EjemplarForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id'].disabled = True
-
-    # estado = forms.ChoiceField(
-    #     widget=forms.Select,
-    #     choices=ESTADO_EJEMPLAR,
-    #     initial='d'
-    # )
 
     class Meta:
         model = Ejemplar

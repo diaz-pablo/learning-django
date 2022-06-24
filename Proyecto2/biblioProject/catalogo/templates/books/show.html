@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-book'></i>" title="Libro" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12 col-md-8">
+            <h1>{{ libro }}</h1>
+            <img src="{{ libro.image.url }}" alt="{{ libro }}" class="img-responsive" width="200px">
+            
+            <hr>
+            
+            <p>
+                <strong>ISBN:</strong>
+                {{ libro.isbn  }}
+            </p>
+            <p>
+                <strong>Resumen:</strong>
+                {{ libro.resumen  }}
+            </p>
+            <p>
+                <strong>Autor:</strong>
+                <a href="{% url 'author_details' libro.autor.id %}">{{ libro.autor }}</a>
+            </p>
+            <p>
+                <strong>Género/s:</strong>
+                {{ libro.muestra_genero }}
+            </p>
+            <p>
+                <strong>Idioma:</strong>
+                {{ libro.idioma }}
+            </p>
+
+            <hr>
+            <h2>Ejemplares</h2>
+            <p>
+                {% if copies %}
+                    Este libro cuenta con {{ copies.count }} ejemplares, de los cuales:
+                    <ul>
+                        {% for copy in copy_by_status %}
+                            <li>
+                                {% if copy.estado == 'm' %}
+                                    <strong>En Mantenimiento:</strong> {{ copy.total }}
+                                {% elif copy.estado == 'p' %}
+                                    <strong>Prestados:</strong> {{ copy.total }}
+                                {% elif copy.estado == 'd' %}
+                                    <strong>Disponibles:</strong> {{ copy.total }}
+                                {% elif copy.estado == 'r' %}
+                                    <strong>Reservado:</strong> {{ copy.total }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    ¡Oops! Este libro no tiene ningún ejemplar aún.
+                {% endif %}
+            </p>
+
+            <hr>
+            
+            <a href="{% url 'book_list' %}" class="btn btn-link">
+                <i class="fas fa-arrow-left mr-1"></i> VOLVER AL LISTADO
+            </a>
+        </div>
+    </div>
+{% endblock %}

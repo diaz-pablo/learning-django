@@ -5,36 +5,39 @@
 {% endblock %}
 
 {% block content %}
-
-    <h1>{{ autor }}</h1>
-    {% if autor.image %}
-        <img src="{{ autor.image.url }}" alt="{{ autor }}" class="img-responsive" width="150px">
-    {% else %}
-        <p class="text-muted mb-0">Sin imágen del autor.</p>
-    {% endif %}
-
-    <hr>
-
-    <p>
-        <strong>Fecha de Nacimiento:</strong>
-        {% if autor.fechaNac %}
-            {{ autor.fechaNac }}
-        {% else %}
-            <span class="text-muted">No se registro la Fecha de Nacimiento.</span>
-        {% endif %}
-    </p>
-    <p>
-        <strong>Fecha de Deceso:</strong>
-        {% if autor.fechaDeceso %}
-            {{ autor.fechaDeceso }}
-        {% else %}
-            <span class="text-muted">No se registro la Fecha de Deceso.</span>
-        {% endif %}
-    </p>
-
-    <hr>
-    
-    <a href="{% url 'author_list' %}" class="btn btn-link">
-        <i class="fas fa-arrow-left mr-1"></i> VOLVER AL LISTADO
-    </a>
+    <div class="row">
+        <div class="col-12 col-md-8">
+            <h1>{{ autor }}</h1>
+            {% if autor.image %}
+                <img src="{{ autor.image.url }}" alt="{{ autor }}" class="img-responsive" width="200px">
+            {% else %}
+                <p class="text-muted mb-0">Sin imágen del autor.</p>
+            {% endif %}
+        
+            <hr>
+        
+            <p>
+                <strong>Fecha de Nacimiento:</strong>
+                {% if autor.fechaNac %}
+                    {{ autor.fechaNac }}
+                {% else %}
+                    <span class="text-muted">No se registro la Fecha de Nacimiento.</span>
+                {% endif %}
+            </p>
+            <p>
+                <strong>Fecha de Deceso:</strong>
+                {% if autor.fechaDeceso %}
+                    {{ autor.fechaDeceso }}
+                {% else %}
+                    <span class="text-muted">No se registro la Fecha de Deceso.</span>
+                {% endif %}
+            </p>
+        
+            <hr>
+            
+            <a href="{% url 'author_list' %}" class="btn btn-link">
+                <i class="fas fa-arrow-left mr-1"></i> VOLVER AL LISTADO
+            </a>
+        </div>
+    </div>
 {% endblock %}

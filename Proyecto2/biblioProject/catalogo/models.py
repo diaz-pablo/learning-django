@@ -1,22 +1,15 @@
 from django.db import models
 from django.urls import reverse
-import uuid # Requerida para las instancias de libros únicos
+import uuid
 from django.utils.html import mark_safe
 
-# Create your models here.
 class Genero(models.Model):
-    """
-        Modelo que representa un género literario
-    """
     nombre = models.CharField(max_length=50, help_text="Ingrese el nombre del género (xej. Programación, BD, SO, etc)")
 
     def __str__(self):
         return self.nombre
 
 class Autor(models.Model):
-    """
-    Modelo que representa un autor
-    """
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
     fechaNac = models.DateField(null=True, blank=True)
@@ -152,7 +145,8 @@ class Ejemplar(models.Model):
         return '%s (%s)' % (self.id, self.libro)
 
     class Meta:
-        ordering = ["libro", "fechaDevolucion"]
+        # ordering = ["libro", "fechaDevolucion"]
+        ordering = ['-id']
 
 class POI(models.Model):
     nombre = models.CharField(max_length=255)

@@ -7,7 +7,7 @@
     
     <hr>
     
-    <p><strong>Autor:</strong> <a href="{% url 'autor' libro.autor.id %}">{{ libro.autor }}</a></p>
+    <p><strong>Autor:</strong> <a href="{% url 'author_details' libro.autor.id %}">{{ libro.autor }}</a></p>
     <p><strong>Resumen:</strong> {{ libro.resumen }}</p>
     <p><strong>ISBN:</strong> {{ libro.isbn }}</p>
     <p><strong>Idioma:</strong> {{ libro.idioma }}</p>
