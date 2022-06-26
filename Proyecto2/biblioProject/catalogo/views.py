@@ -545,57 +545,6 @@ def language_delete(request, pk):
 
     return redirect('language_list')
 
-
-# def idioma_list(request):
-#     idiomas = Idioma.objects.all()
-
-#     context = {
-#         'idiomas': idiomas
-#     }
-
-#     return render(request, 'idioma_list.html', context)
-
-
-# def idioma_new(request):
-#     if request.method == "POST":
-#         formulario = IdiomaForm(request.POST)
-
-#         if formulario.is_valid():
-#             idioma = formulario.save(commit=False)
-#             idioma.nombre = formulario.cleaned_data['nombre']
-#             idioma.save()
-
-#             return redirect('idioma_list')
-#     else:
-#         formulario = IdiomaForm()
-
-#     return render(request, 'idioma_new.html', {'formulario': formulario})
-
-
-# def idioma_update(request, pk):
-#     idioma = get_object_or_404(Idioma, pk=pk)
-
-#     if request.method == "POST":
-#         formulario = IdiomaForm(request.POST, instance=idioma)
-
-#         if formulario.is_valid():
-#             idioma = formulario.save(commit=False)
-#             idioma.nombre = formulario.cleaned_data['nombre']
-#             idioma.save()
-
-#             return redirect('idioma_list')
-#     else:
-#         formulario = IdiomaForm(instance=idioma)
-
-#     return render(request, 'idioma_new.html', {'formulario': formulario})
-
-
-# def idioma_delete(request, pk):
-#     idioma = get_object_or_404(Idioma, pk=pk)
-#     idioma.delete()
-
-#     return redirect('idioma_list')
-
 def ChartData(request):
     chartLabel = "Préstamos"
     etiquetas = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',

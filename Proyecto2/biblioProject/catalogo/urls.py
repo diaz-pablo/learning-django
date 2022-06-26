@@ -39,12 +39,6 @@ urlpatterns = [
     path('idioma/actualizar/<pk>', views.language_update, name='language_update'),
     path('idioma/eliminar/<pk>', views.language_delete, name='language_delete'),
     path('idioma/detalle/<pk>', views.LanguageDetailView.as_view(), name='language_details'),
-    
-    # path('idiomas/', views.idioma_list, name='idioma_list'),
-    # path('idioma/new/', views.idioma_new, name='idioma_new'),
-    # path('idioma/update/<pk>', views.idioma_update, name='idioma_update'),
-    # path('idioma/delete/<pk>', views.idioma_delete, name='idioma_delete'),
-
 
     path('charts/', views.ChartData, name='charts'),
     path('map/', views.POIsMapView.as_view(), name='map'),
