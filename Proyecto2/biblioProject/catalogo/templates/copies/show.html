@@ -28,6 +28,14 @@
                 <strong>Estado:</strong>
                 {{ ejemplar.get_estado_display }}
             </p>
+            <p>
+                <strong>Usuario:</strong>
+                {% if ejemplar.usuario %}
+                    {{ ejemplar.usuario }}
+                {% else %}
+                    No se asignó a ningún usuario
+                {% endif %}
+            </p>
 
             <hr>
             

@@ -9,9 +9,15 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.contrib import messages
-from catalogo.forms import AuthorForm, BookForm, CopyForm, GenderForm, LanguageForm
+from catalogo.forms import AuthorForm, BookForm, CopyForm, GenderForm, LanguageForm, CustomUserCreationForm
 from random import randint
 from django.views.generic.base import TemplateView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import Group
 
 def index(request):
     nroGeneros = Genero.objects.all().count()
@@ -34,18 +40,19 @@ def index(request):
     return render(request, 'index.html', context)
 
 """ AUTORES """
-class AuthorListView(generic.ListView):
+class AuthorListView(PermissionRequiredMixin, generic.ListView):
     model = Autor
     context_object_name = 'authors'
     paginate_by = 5
-    # context_object_name = 'authors'
+    permission_required = 'catalogo.view_autor'
 
     queryset = Autor.objects.order_by('-id')
     template_name = 'authors/index.html'
 
-class AuthorDetailView(generic.DetailView):
+class AuthorDetailView(PermissionRequiredMixin, generic.DetailView):
     model = Autor
     template_name = 'authors/show.html'
+    permission_required = 'catalogo.view_autor'
 
     def autor_detail_view(request, pk):
         try:
@@ -59,6 +66,8 @@ class AuthorDetailView(generic.DetailView):
 
         return render(request, 'authors/show.html', context)
 
+@login_required
+@permission_required('catalogo.add_autor')
 def author_create(request):
     if request.method == "POST":
         form = AuthorForm(request.POST, request.FILES)
@@ -86,6 +95,8 @@ def author_create(request):
 
     return render(request, 'authors/create.html', context)
 
+@login_required
+@permission_required('catalogo.change_autor')
 def author_update(request, pk):
     author = get_object_or_404(Autor, pk=pk)
 
@@ -121,6 +132,8 @@ def author_update(request, pk):
 
     return render(request, 'authors/edit.html', context)
 
+@login_required
+@permission_required('catalogo.delete_autor')
 def author_delete(request, pk):
     author = get_object_or_404(Autor, pk=pk)
     author.delete()
@@ -130,11 +143,12 @@ def author_delete(request, pk):
     return redirect('author_list')
 
 """ LIBROS """
-class BookListView(ListView):
+class BookListView(PermissionRequiredMixin, ListView):
     model = Libro
     template_name = 'books/index.html'
     paginate_by = 5
     # context_object_name = 'books'
+    permission_required = 'catalogo.view_libro'
 
     def get_context_data(self, **kwargs):
         books = Libro.objects.order_by('-id')
@@ -154,9 +168,10 @@ class BookListView(ListView):
 
         return context
 
-class BookDetailView(DetailView):
+class BookDetailView(PermissionRequiredMixin, DetailView):
     model = Libro
     template_name = 'books/show.html'
+    permission_required = 'catalogo.view_libro'
 
     def get_context_data(self, *args, **kwargs):
         book = Libro.objects.get(pk=self.kwargs['pk'])
@@ -169,6 +184,8 @@ class BookDetailView(DetailView):
 
         return context
 
+@login_required
+@permission_required('catalogo.add_libro')
 def book_create(request):
     if request.method == "POST":
         form = BookForm(request.POST, request.FILES)
@@ -199,6 +216,8 @@ def book_create(request):
 
     return render(request, 'books/create.html', context)
 
+@login_required
+@permission_required('catalogo.change_libro')
 def book_update(request, pk):
     book = get_object_or_404(Libro, pk=pk)
 
@@ -242,6 +261,8 @@ def book_update(request, pk):
 
     return render(request, 'books/edit.html', context)
 
+@login_required
+@permission_required('catalogo.delete_libro')
 def book_delete(request, pk):
     book = get_object_or_404(Libro, pk=pk)
     book.delete()
@@ -251,11 +272,12 @@ def book_delete(request, pk):
     return redirect('book_list')
 
 """ EJEMPLARES """
-class CopyListView(ListView):
+class CopyListView(PermissionRequiredMixin, ListView):
     model = Ejemplar
     template_name = 'copies/index.html'
     paginate_by = 5
     # context_object_name = 'copies'
+    permission_required = 'catalogo.view_ejemplar'
 
     def get_context_data(self, **kwargs):
         copies = Ejemplar.objects.order_by('-id')
@@ -275,9 +297,10 @@ class CopyListView(ListView):
 
         return context
 
-class CopyDetailView(DetailView):
+class CopyDetailView(PermissionRequiredMixin, DetailView):
     model = Ejemplar
     template_name = 'copies/show.html'
+    permission_required = 'catalogo.view_ejemplar'
 
     def get_context_data(self, *args, **kwargs):
         copy = Ejemplar.objects.get(pk=self.kwargs['pk'])
@@ -285,6 +308,8 @@ class CopyDetailView(DetailView):
         
         return context
 
+@login_required
+@permission_required('catalogo.add_ejemplar')
 def copy_create(request):
     if request.method == "POST":
         form = CopyForm(request.POST)
@@ -310,6 +335,8 @@ def copy_create(request):
 
     return render(request, 'copies/create.html', context)
 
+@login_required
+@permission_required('catalogo.change_ejemplar')
 def copy_update(request, pk):
     copy = get_object_or_404(Ejemplar, pk=pk)
 
@@ -322,6 +349,7 @@ def copy_update(request, pk):
             copy.libro = form.cleaned_data['libro']
             copy.fechaDevolucion = form.cleaned_data['fechaDevolucion']
             copy.estado = form.cleaned_data['estado']
+            copy.usuario = form.cleaned_data['usuario']
 
             copy.save()
 
@@ -343,6 +371,8 @@ def copy_update(request, pk):
 
     return render(request, 'copies/edit.html', context)
 
+@login_required
+@permission_required('catalogo.delete_ejemplar')
 def copy_delete(request, pk):
     copy = get_object_or_404(Ejemplar, pk=pk)
     copy.delete()
@@ -352,11 +382,12 @@ def copy_delete(request, pk):
     return redirect('copy_list')
 
 """ GÉNEROS """
-class GenderListView(ListView):
+class GenderListView(PermissionRequiredMixin, ListView):
     model = Genero
     template_name = 'genders/index.html'
     paginate_by = 5
     # context_object_name = 'genders'
+    permission_required = 'catalogo.view_genero'
 
     def get_context_data(self, **kwargs):
         genders = Genero.objects.order_by('-id')
@@ -376,9 +407,10 @@ class GenderListView(ListView):
 
         return context
 
-class GenderDetailView(DetailView):
+class GenderDetailView(PermissionRequiredMixin, DetailView):
     model = Genero
     template_name = 'genders/show.html'
+    permission_required = 'catalogo.view_genero'
 
     def get_context_data(self, *args, **kwargs):
         gender = Genero.objects.get(pk=self.kwargs['pk'])
@@ -386,6 +418,8 @@ class GenderDetailView(DetailView):
         
         return context
 
+@login_required
+@permission_required('catalogo.add_genero')
 def gender_create(request):
     if request.method == "POST":
         form = GenderForm(request.POST)
@@ -409,6 +443,8 @@ def gender_create(request):
 
     return render(request, 'genders/create.html', context)
 
+@login_required
+@permission_required('catalogo.change_genero')
 def gender_update(request, pk):
     gender = get_object_or_404(Genero, pk=pk)
 
@@ -440,6 +476,8 @@ def gender_update(request, pk):
 
     return render(request, 'genders/edit.html', context)
 
+@login_required
+@permission_required('catalogo.delete_genero')
 def gender_delete(request, pk):
     gender = get_object_or_404(Genero, pk=pk)
     gender.delete()
@@ -449,11 +487,12 @@ def gender_delete(request, pk):
     return redirect('gender_list')
 
 """ IDIOMAS """
-class LanguageListView(ListView):
+class LanguageListView(PermissionRequiredMixin, ListView):
     model = Idioma
     template_name = 'languages/index.html'
     paginate_by = 5
     # context_object_name = 'languages'
+    permission_required = 'catalogo.view_idioma'
 
     def get_context_data(self, **kwargs):
         languages = Idioma.objects.order_by('-id')
@@ -473,9 +512,10 @@ class LanguageListView(ListView):
 
         return context
 
-class LanguageDetailView(DetailView):
+class LanguageDetailView(PermissionRequiredMixin, DetailView):
     model = Idioma
     template_name = 'languages/show.html'
+    permission_required = 'catalogo.view_idioma'
 
     def get_context_data(self, *args, **kwargs):
         language = Idioma.objects.get(pk=self.kwargs['pk'])
@@ -483,6 +523,8 @@ class LanguageDetailView(DetailView):
         
         return context
 
+@login_required
+@permission_required('catalogo.add_idioma')
 def language_create(request):
     if request.method == "POST":
         form = LanguageForm(request.POST)
@@ -506,6 +548,8 @@ def language_create(request):
 
     return render(request, 'languages/create.html', context)
 
+@login_required
+@permission_required('catalogo.change_idioma')
 def language_update(request, pk):
     language = get_object_or_404(Idioma, pk=pk)
 
@@ -537,6 +581,8 @@ def language_update(request, pk):
 
     return render(request, 'languages/edit.html', context)
 
+@login_required
+@permission_required('catalogo.delete_idioma')
 def language_delete(request, pk):
     language = get_object_or_404(Idioma, pk=pk)
     language.delete()
@@ -545,6 +591,7 @@ def language_delete(request, pk):
 
     return redirect('language_list')
 
+@login_required
 def ChartData(request):
     chartLabel = "Préstamos"
     etiquetas = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -565,8 +612,7 @@ def ChartData(request):
 
     return render(request, 'charts.html', context)
 
-
-class POIsMapView(TemplateView):
+class POIsMapView(LoginRequiredMixin, TemplateView):
     """POIS and map view."""
 
     template_name = "map.html"
@@ -589,3 +635,35 @@ class POIsMapView(TemplateView):
         context["markers"] = lista
 
         return context
+
+class MyLoansListView(PermissionRequiredMixin, generic.ListView):
+    model = Ejemplar
+    paginate_by = 5
+    context_object_name = 'my_loans'
+    template_name ='my_loans/index.html'
+    permission_required = 'catalogo.can_view_my_loans'
+
+    def get_queryset(self):
+        return Ejemplar.objects.filter(usuario=self.request.user).filter(estado__exact='p').order_by('fechaDevolucion')
+
+def register(request):
+    context = {
+        'form': CustomUserCreationForm()
+    }
+
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+
+            group = Group.objects.get(name='Members')
+            user.groups.add(group)
+
+            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])
+            login(request, user)
+
+            return redirect('index')
+
+        context['form'] = form
+
+    return render(request, 'registration/register.html', context)

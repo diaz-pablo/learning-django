@@ -1,6 +1,9 @@
 from django import forms
 from catalogo.models import Autor, Libro, Ejemplar, Genero, Idioma
 from django.forms.widgets import NumberInput
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from django.forms import ValidationError
 
 class AuthorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -55,6 +58,15 @@ class BookForm(forms.ModelForm):
         self.fields['genero'].label = "Género/s"
         self.fields['image'].label = "Imagen"
 
+    def clean_titulo(self):
+        titulo = self.cleaned_data['titulo']
+        existe = Libro.objects.filter(titulo__iexact=titulo).exists()
+
+        if existe:
+            raise ValidationError("El título del libro ya existe!")
+
+        return titulo
+
     class Meta:
         model = Libro
         fields = ('titulo', 'autor', 'resumen', 'isbn', 'idioma', 'genero', 'image')
@@ -68,13 +80,14 @@ class CopyForm(forms.ModelForm):
         self.fields['libro'].label = "Libro"
         self.fields['estado'].label = "Estado"
         self.fields['fechaDevolucion'].label = "Fecha de Devolución"
+        self.fields['usuario'].label = "Usuario"
 
         self.fields['id'].disabled = True
         # self.fields['libro'].required = False
 
     class Meta:
         model = Ejemplar
-        fields = ('id', 'libro', 'estado', 'fechaDevolucion')
+        fields = ('id', 'libro', 'estado', 'fechaDevolucion', 'usuario')
 
         widgets = {
             'fechaDevolucion': NumberInput(attrs={'type': 'date'}),
@@ -99,3 +112,8 @@ class LanguageForm(forms.ModelForm):
     class Meta:
         model = Idioma
         fields = ('nombre',)
+
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')

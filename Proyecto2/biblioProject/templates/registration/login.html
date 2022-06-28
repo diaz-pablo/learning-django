@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center">
+  {% if next %}
+  <div class="col-12 mt-3">
+    {% if user.is_authenticated %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      Su cuenta no tiene acceso a esta página. Para continuar, inicie sesión con una cuenta que tenga acceso.
+
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% else %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+      Por favor inicie sesión para ver esta página.
+
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="col-12 col-md-6 mt-5">
+    <div class="card">
+      <form method="post" action="{% url 'login' %}">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Ingrese sus credenciales</h5>
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label for="username">Nombre de usuario*</label>
+            <input type="text" class="form-control {% if form.errors %} is-invalid {% endif %}" id="username" name="username" autofocus>
+
+            {% if form.errors %}
+            <div id="validationServer03Feedback" class="invalid-feedback">
+              Su nombre de usuario y contraseña no coinciden. Por favor, inténtalo de nuevo.
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label for="password">Contraseña*</label>
+            <input type="password" class="form-control" id="password" name="password">
+          </div>
+          {# Assumes you setup the password_reset view in your URLconf #}
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <a href="{% url 'password_reset' %}" class="btn btn-link text-uppercase">
+            <i class="fas fa-question-circle mr-1"></i>¿Perdiste tu contraseña?
+          </a>
+
+          <input type="hidden" name="next" value="{{ next }}">
+          <button type="submit" class="btn btn-success text-uppercase">
+            <i class="fas fa-fingerprint mr-1"></i> Iniciar sesión
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

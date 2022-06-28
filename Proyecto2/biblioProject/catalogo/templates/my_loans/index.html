@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+{% include "partials/jumbotron.html" with icon="<i class='fas fa-book-open'></i>" title="Mis Préstamos" %}
+{% endblock %}
+
+{% block content %}
+
+{% if my_loans %}
+    <ul>
+
+        {% for my_loan in my_loans %}
+            <li class="">
+                {# <a href="% url 'book-detail' my_loan.book.pk %}">{{my_loan.book.title}}</a> ({{ my_loan.due_back }}) #}
+
+                <a href="{% url 'copy_details' my_loan.id %}">{{ my_loan }}</a> 
+                {% if my_loan.es_deudor %}
+                    <span class="text-danger">¡Debes devolver este libro o se te inabilitará los prestamos!</span>
+                {% else %}
+                    (Fecha de devolución: {{ my_loan.fechaDevolucion }})
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% block pagination %}
+        {% if is_paginated %}
+            <div class="pagination">
+                <span class="page-links">
+                    {% if page_obj.has_previous %}
+                    <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Anterior</a>
+                    {% endif %}
+                    <span class="page-current">
+                        Pág. {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                    </span>
+                    {% if page_obj.has_next %}
+                    <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">Siguiente</a>
+                    {% endif %}
+                </span>
+            </div>
+        {% endif %}
+    {% endblock %}
+{% else %}
+    <div class="alert alert-primary" role="alert">
+        ¡No tienes libros para devolver! Revisa nuestro <a href="{% url 'book_list' %}">Catálogo de Libros</a> y reserva
+        desde <a href="{% url 'copy_list' %}">aquí</a>.
+    </div>
+{% endif %}
+{% endblock %}

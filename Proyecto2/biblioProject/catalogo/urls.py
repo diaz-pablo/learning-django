@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from catalogo import views
 
 urlpatterns = [
@@ -42,4 +42,8 @@ urlpatterns = [
 
     path('charts/', views.ChartData, name='charts'),
     path('map/', views.POIsMapView.as_view(), name='map'),
+
+    path('mis-prestamos/', views.MyLoansListView.as_view(), name='my_loans'),
+
+    path('accounts/register/', views.register, name="register")
 ]

@@ -12,9 +12,11 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <span class="font-weight-bold">LISTADO DE LIBROS</span>
 
-            <a href="{% url 'book_create' %}" class="btn btn-success">
-                <i class="fas fa-plus mr-1"></i> NUEVO LIBRO
-            </a>
+            {% if perms.catalogo.add_libro %}
+                <a href="{% url 'book_create' %}" class="btn btn-success">
+                    <i class="fas fa-plus mr-1"></i> NUEVO LIBRO
+                </a>
+            {% endif %}
         </div>
 
         <div class="card shadow-sm">
@@ -28,7 +30,9 @@
                             <th scope="col">Resumen</th>
                             <th scope="col">Autor</th>
                             <th scope="col">Género/s</th>
+                            {% if perms.catalogo.change_libro or perms.catalogo.delete_libro %}
                             <th scope="col" class="text-center">Acciones</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -46,30 +50,44 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'book_details' book.id %}">{{ book }}</a>
+                                {% if perms.catalogo.view_libro %}
+                                    <a href="{% url 'book_details' book.id %}">{{ book }}</a>
+                                {% else %}
+                                    {{ book }}
+                                {% endif %}
                             </td>
                             <td>
                                 {{ book.resumen|slice:"0:50"  }}...
                             </td>
                             <td>
+                                {% if perms.catalogo.view_autor %}
                                 <a href="{% url 'author_details' book.autor.id %}">{{ book.autor }}</a>
+                                {% else %}
+                                    {{ book.autor }}
+                                {% endif %}
                             </td>
                             <td>
                                 {{ book.muestra_genero }}
                             </td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <a href="{% url 'book_update' book.id %}" class="btn btn-warning">
-                                        <i class="fas fa-edit font-weight-light mr-1"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-danger" data-toggle="modal"
-                                    data-target="#book-{{ book.id }}">
-                                        <i class="fas fa-trash-alt font-weight-light mr-1"></i>
-                                    </button>
-                                </div>
+                            {% if perms.catalogo.change_libro or perms.catalogo.delete_libro %}
+                                <td class="text-center">
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        {% if perms.catalogo.change_libro %}
+                                            <a href="{% url 'book_update' book.id %}" class="btn btn-warning">
+                                                <i class="fas fa-edit font-weight-light mr-1"></i>
+                                            </a>
+                                        {% endif %}
+                                        {% if perms.catalogo.delete_libro %}
+                                            <button type="button" class="btn btn-danger" data-toggle="modal"
+                                            data-target="#book-{{ book.id }}">
+                                                <i class="fas fa-trash-alt font-weight-light mr-1"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
 
-                                {% include "books/partials/modal.html" %}
-                            </td>
+                                    {% include "books/partials/modal.html" %}
+                                </td>
+                            {% endif %}
                         </tr>
                         {% empty %}
                             <tr class="bg-red">

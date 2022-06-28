@@ -12,9 +12,11 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <span class="font-weight-bold">LISTADO DE GÉNEROS</span>
 
-            <a href="{% url 'gender_create' %}" class="btn btn-success">
-                <i class="fas fa-plus mr-1"></i> NUEVO GÉNERO
-            </a>
+            {% if perms.catalogo.add_genero %}
+                <a href="{% url 'gender_create' %}" class="btn btn-success">
+                    <i class="fas fa-plus mr-1"></i> NUEVO GÉNERO
+                </a>
+            {% endif %}
         </div>
 
         <div class="card shadow-sm">
@@ -24,7 +26,9 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Nombre</th>
-                            <th scope="col" class="text-center">Acciones</th>
+                            {% if perms.catalogo.change_genero or perms.catalogo.delete_genero %}
+                                <th scope="col" class="text-center">Acciones</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -34,21 +38,31 @@
                                 {{ gender.id }}
                             </th>
                             <td>
-                                <a href="{% url 'gender_details' gender.id %}">{{ gender.nombre }}</a>
+                                {% if perms.catalogo.view_genero %}
+                                    <a href="{% url 'gender_details' gender.id %}">{{ gender.nombre }}</a>
+                                {% else %}
+                                    {{ gender.nombre }}
+                                {% endif %}
                             </td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <a href="{% url 'gender_update' gender.id %}" class="btn btn-warning">
-                                        <i class="fas fa-edit font-weight-light mr-1"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-danger" data-toggle="modal"
-                                    data-target="#gender-{{ gender.id }}">
-                                        <i class="fas fa-trash-alt font-weight-light mr-1"></i>
-                                    </button>
-                                </div>
+                            {% if perms.catalogo.change_genero or perms.catalogo.delete_genero %}
+                                <td class="text-center">
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        {% if perms.catalogo.change_genero %}
+                                            <a href="{% url 'gender_update' gender.id %}" class="btn btn-warning">
+                                                <i class="fas fa-edit font-weight-light mr-1"></i>
+                                            </a>
+                                        {% endif %}
+                                        {% if perms.catalogo.delete_genero %}
+                                            <button type="button" class="btn btn-danger" data-toggle="modal"
+                                            data-target="#gender-{{ gender.id }}">
+                                                <i class="fas fa-trash-alt font-weight-light mr-1"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
 
-                                {% include "genders/partials/modal.html" %}
-                            </td>
+                                    {% include "genders/partials/modal.html" %}
+                                </td>
+                            {% endif %}
                         </tr>
                         {% empty %}
                             <tr class="bg-red">

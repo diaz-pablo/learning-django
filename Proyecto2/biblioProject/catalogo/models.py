@@ -2,6 +2,8 @@ from django.db import models
 from django.urls import reverse
 import uuid
 from django.utils.html import mark_safe
+from django.contrib.auth.models import User
+from datetime import date
 
 class Genero(models.Model):
     nombre = models.CharField(max_length=50, help_text="Ingrese el nombre del género (xej. Programación, BD, SO, etc)")
@@ -65,7 +67,8 @@ class Libro(models.Model):
     isbn = models.CharField('ISBN',max_length=13, help_text='13 Caracteres (<a href="https://www.isbninternational.org/content/what-isbn">ISBN number</a>)')
     genero = models.ManyToManyField(Genero, help_text="Seleccione un género (o varios) para el libro")
     idioma = models.ForeignKey(Idioma, on_delete=models.SET_NULL, null=True)
-    image=models.ImageField(upload_to='images', default='catalogo/upload/img/default-libro.jpg')
+    image=models.ImageField(upload_to='catalogo/upload/img', default='catalogo/upload/img/default-libro.jpg')
+    
     
     # Eliminar imagen fisicamente
     def remove_on_image_update(self):
@@ -118,12 +121,20 @@ class Ejemplar(models.Model):
     )
 
     estado = models.CharField(max_length=1, choices=ESTADO_EJEMPLAR, default='d', help_text='Disponibilidad del Ejemplar')
-    
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    @property
+    def es_deudor(self):
+        """Determina si un usuario devolvio o no un libro prestado."""
+        return bool(self.fechaDevolucion and date.today() > self.fechaDevolucion)
+
     def __str__(self):
         return '%s (%s)' % (self.libro, self.id)
 
     class Meta:
         ordering = ['libro', 'fechaDevolucion']
+
+        permissions = (("can_view_my_loans", "Puedo ver mis préstamos"),)
 
 class POI(models.Model):
     nombre = models.CharField(max_length=255)

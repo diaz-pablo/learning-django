@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg  navbar-dark bg-dark">
-    <div class="container">
+    <div class="container-fluid">
         <a class="navbar-brand" href="{% url 'index' %}">Catálogo</a>
 
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -14,42 +14,87 @@
                             Inicio <span class="sr-only">(current)</span>
                         </a>
                     </li>
-                    <li class="nav-item {% if url_name == 'author_list' %} active {% endif %}">
-                        <a class="nav-link" href="{% url 'author_list' %}">
-                            Autores <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {% if url_name == 'book_list' %} active {% endif %}">
-                        <a class="nav-link" href="{% url 'book_list' %}">
-                            Libros <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {% if url_name == 'copy_list' %} active {% endif %}">
-                        <a class="nav-link" href="{% url 'copy_list' %}">
-                            Ejemplares <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {% if url_name == 'gender_list' %} active {% endif %}">
-                        <a class="nav-link" href="{% url 'gender_list' %}">
-                            Géneros <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {% if url_name == 'language_list' %} active {% endif %}">
-                        <a class="nav-link" href="{% url 'language_list' %}">
-                            Idiomas <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {% if url_name == 'charts' %} active {% endif %}">
-                        <a class="nav-link" href="{% url 'charts' %}">
-                            Gráficos <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
-                    <li class="nav-item {% if url_name == 'map' %} active {% endif %}">
-                        <a class="nav-link" href="{% url 'map' %}">
-                            Puntos de Interés <span class="sr-only">(current)</span>
-                        </a>
-                    </li>
+                    {% if user.is_authenticated %}
+                        {% if perms.catalogo.view_autor %}
+                            <li class="nav-item {% if url_name == 'author_list' %} active {% endif %}">
+                                <a class="nav-link" href="{% url 'author_list' %}">
+                                    Autores <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if perms.catalogo.view_libro %}
+                            <li class="nav-item {% if url_name == 'book_list' %} active {% endif %}">
+                                <a class="nav-link" href="{% url 'book_list' %}">
+                                    Libros <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if perms.catalogo.view_ejemplar %}
+                            <li class="nav-item {% if url_name == 'copy_list' %} active {% endif %}">
+                                <a class="nav-link" href="{% url 'copy_list' %}">
+                                    Ejemplares <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if perms.catalogo.view_genero %}
+                            <li class="nav-item {% if url_name == 'gender_list' %} active {% endif %}">
+                                <a class="nav-link" href="{% url 'gender_list' %}">
+                                    Géneros <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if perms.catalogo.view_idioma %}
+                            <li class="nav-item {% if url_name == 'language_list' %} active {% endif %}">
+                                <a class="nav-link" href="{% url 'language_list' %}">
+                                    Idiomas <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item {% if url_name == 'charts' %} active {% endif %}">
+                            <a class="nav-link" href="{% url 'charts' %}">
+                                Gráficos <span class="sr-only">(current)</span>
+                            </a>
+                        </li>
+                        <li class="nav-item {% if url_name == 'map' %} active {% endif %}">
+                            <a class="nav-link" href="{% url 'map' %}">
+                                Puntos de Interés <span class="sr-only">(current)</span>
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
+                    <ul class="navbar-nav ml-auto">
+                        {% if user.is_authenticated %}
+                            {% if perms.catalogo.can_view_my_loans %}
+                                <li class="nav-item {% if url_name == 'my_loans' %} active {% endif %}">
+                                    <a class="nav-link" href="{% url 'my_loans' %}">
+                                        Mis Préstamos <span class="sr-only">(current)</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-capitalize" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                                    {{ user.get_username }}
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{% url 'logout' %}">
+                                        Cerrar sesión
+                                    </a>
+                                </div>
+                            </li>
+                        {% else %}
+                            <li class="nav-item {% if url_name == 'login' %} active {% endif %}">
+                                <a class="nav-link" href="{% url 'login' %}">
+                                    Iniciar sesión <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+
+                            <li class="nav-item {% if url_name == 'register' %} active {% endif %}">
+                                <a class="nav-link" href="{% url 'register' %}">
+                                    Registrarme <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
             {% endwith %}
         </div>
     </div>

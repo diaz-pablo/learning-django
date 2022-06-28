@@ -12,9 +12,11 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <span class="font-weight-bold">LISTADO DE EJEMPLARES</span>
 
-            <a href="{% url 'copy_create' %}" class="btn btn-success">
-                <i class="fas fa-plus mr-1"></i> NUEVO EJEMPLAR
-            </a>
+            {% if perms.catalogo.add_ejemplar %}
+                <a href="{% url 'copy_create' %}" class="btn btn-success">
+                    <i class="fas fa-plus mr-1"></i> NUEVO EJEMPLAR
+                </a>
+            {% endif %}
         </div>
 
         <div class="card shadow-sm">
@@ -26,17 +28,28 @@
                             <th scope="col">Libro</th>
                             <th scope="col">Fecha de Devolución</th>
                             <th scope="col">Estado</th>
-                            <th scope="col" class="text-center">Acciones</th>
+                            <th scope="col">Usuario</th>
+                            {% if perms.catalogo.change_ejemplar or perms.catalogo.delete_ejemplar %}
+                                <th scope="col" class="text-center">Acciones</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
                         {% for copy in copies %}
                         <tr>
                             <th scope="row">
-                                <a href="{% url 'copy_details' copy.id %}">{{ copy.id }}</a>
+                                {% if perms.catalogo.view_ejemplar %}
+                                    <a href="{% url 'copy_details' copy.id %}">{{ copy.id }}</a>
+                                {% else %}
+                                    {{ copy.id }}
+                                {% endif %}
                             </th>
                             <td>
-                                <a href="{% url 'book_details' copy.libro.id %}">{{ copy.libro }}</a>
+                                {% if perms.catalogo.view_libro %}
+                                    <a href="{% url 'book_details' copy.libro.id %}">{{ copy.libro }}</a>
+                                {% else %}
+                                    {{ copy.libro }}
+                                {% endif %}
                             </td>
                             <td>
                                 {% if copy.fechaDevolucion %}
@@ -48,19 +61,32 @@
                             <td>
                                 {{ copy.get_estado_display }}
                             </td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <a href="{% url 'copy_update' copy.id %}" class="btn btn-warning">
-                                        <i class="fas fa-edit font-weight-light mr-1"></i>
-                                    </a>
-                                    <button type="button" class="btn btn-danger" data-toggle="modal"
-                                    data-target="#copy-{{ copy.id }}">
-                                        <i class="fas fa-trash-alt font-weight-light mr-1"></i>
-                                    </button>
-                                </div>
-
-                                {% include "copies/partials/modal.html" %}
+                            <td>
+                                {% if copy.usuario %}
+                                    <p class="font-weight-bold">{{ copy.usuario }}</p>
+                                {% else %}
+                                    <p class="text-muted mb-0">No se asignó a ningún usuario</p>
+                                {% endif %}
                             </td>
+                            {% if perms.catalogo.change_ejemplar or perms.catalogo.delete_ejemplar %}
+                                <td class="text-center">
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        {% if perms.catalogo.change_ejemplar %}
+                                            <a href="{% url 'copy_update' copy.id %}" class="btn btn-warning">
+                                                <i class="fas fa-edit font-weight-light mr-1"></i>
+                                            </a>
+                                        {% endif %}
+                                        {% if perms.catalogo.delete_ejemplar %}
+                                            <button type="button" class="btn btn-danger" data-toggle="modal"
+                                            data-target="#copy-{{ copy.id }}">
+                                                <i class="fas fa-trash-alt font-weight-light mr-1"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+
+                                    {% include "copies/partials/modal.html" %}
+                                </td>
+                            {% endif %}
                         </tr>
                         {% empty %}
                             <tr class="bg-red">
