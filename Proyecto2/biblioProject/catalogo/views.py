@@ -18,6 +18,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import Group
+# Reporte
+import io
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib.pagesizes import A4
+from datetime import date
+from django.core import serializers
 
 def index(request):
     nroGeneros = Genero.objects.all().count()
@@ -643,6 +651,8 @@ class MyLoansListView(PermissionRequiredMixin, generic.ListView):
     template_name ='my_loans/index.html'
     permission_required = 'catalogo.can_view_my_loans'
 
+    # q = 
+    print(1)
     def get_queryset(self):
         return Ejemplar.objects.filter(usuario=self.request.user).filter(estado__exact='p').order_by('fechaDevolucion')
 
@@ -667,3 +677,77 @@ def register(request):
         context['form'] = form
 
     return render(request, 'registration/register.html', context)
+
+def AutorReport(request):
+    today = date.today().strftime('%Y-%m-%d')
+    buffer = io.BytesIO()
+    report = canvas.Canvas(buffer, pagesize=A4)
+    data = Autor.objects.all()
+    report.setFont('Helvetica', 15, leading=None)
+    report.setFillColorRGB(0.30,0.45,0.25)
+    report.drawString(260,800,'Catalogo:: Autores')
+    report.line(0,780,1000,780)
+    x1=0
+    y1=750
+    counter = 0
+
+    object_list= serializers.serialize("python", data)
+
+    for object in object_list:
+        counter= counter + 1
+        for field_name, field_value in object['fields'].items():
+            if counter==1:
+                report.setFont("Helvetica",12,leading=None)
+                report.drawString(x1+100,y1,field_name)
+                report.line(0,880,1000,780)
+            else:
+                report.setFont("Helvetica",11,leading=None)
+                
+                if field_name=='fechaNac' or field_name=='fechaDeceso':
+                    if field_value!=None:
+                        valor=str(field_value)
+                    else:
+                        valor=''
+                    report.drawString(x1+100,y1, valor) 
+                elif field_name=='image':
+                    if field_value!='':
+                        valor=f'http://localhost:8000/{field_value}'
+                        report.drawImage(valor, x1+100, y1, 25, 25) 
+                else:
+                    valor=field_value
+                    report.drawString(x1+100,y1, valor)
+
+            x1 = x1 + 100
+
+        y1 = y1 - 50
+        x1=2
+
+        if counter==1:
+            for field_name, field_value in object['fields'].items():
+                report.setFont("Helvetica",11,leading=None)
+                
+                if field_name=='fechaNac' or field_name=='fechaDeceso':
+                    if field_value!=None:
+                        valor=str(field_value)
+                    else:
+                        valor=''
+                    report.drawString(x1+100,y1, valor) 
+                elif field_name=='image':
+                    if field_value!='':
+                        valor=f'http://localhost:8000/{field_value}'
+                        report.drawImage(valor, x1+100, y1, 25, 25) 
+                else:
+                    valor=field_value
+                    report.drawString(x1+100,y1, valor)
+                x1 = x1 + 100
+
+            y1 = y1 - 50
+            x1=2
+        
+
+    report.setTitle(f'DW2022: Reporte del {today}')
+    report.showPage()
+    report.save()
+    buffer.seek(0)
+    
+    return FileResponse(buffer, as_attachment=True, filename="reporte.pdf")

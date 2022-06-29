@@ -64,6 +64,13 @@
                 </ul>
                     <ul class="navbar-nav ml-auto">
                         {% if user.is_authenticated %}
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'reporte_autor' %}" target="_blank">
+                                    Reporte de Autores
+                                </a>
+                            </li>
+
                             {% if perms.catalogo.can_view_my_loans %}
                                 <li class="nav-item {% if url_name == 'my_loans' %} active {% endif %}">
                                     <a class="nav-link" href="{% url 'my_loans' %}">
