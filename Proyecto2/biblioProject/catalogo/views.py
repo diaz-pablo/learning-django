@@ -664,6 +664,7 @@ def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
+            print(form)
             user = form.save()
 
             group = Group.objects.get(name='Members')

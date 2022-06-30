@@ -137,6 +137,7 @@ class Ejemplar(models.Model):
         permissions = (("can_view_my_loans", "Puedo ver mis préstamos"),)
 
 class POI(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     nombre = models.CharField(max_length=255)
     lng = models.FloatField()
     lat = models.FloatField()

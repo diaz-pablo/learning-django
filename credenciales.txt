@@ -1,0 +1,19 @@
+admin -> 4dm1n12345
+member -> m3mb3r12345
+librarian -> l1br4r14n12345
+
+
+catalogo/ accounts/ login/ [name='login']
+catalogo/ accounts/ logout/ [name='logout']
+catalogo/ accounts/ password_change/ [name='password_change']
+catalogo/ accounts/ password_change/done/ [name='password_change_done']
+catalogo/ accounts/ password_reset/ [name='password_reset']
+catalogo/ accounts/ password_reset/done/ [name='password_reset_done']
+catalogo/ accounts/ reset/<uidb64>/<token>/ [name='password_reset_confirm']
+catalogo/ accounts/ reset/done/ [name='password_reset_complete']
+
+
+unsa
+
+long -65,4059906
+lat -24,72823906
