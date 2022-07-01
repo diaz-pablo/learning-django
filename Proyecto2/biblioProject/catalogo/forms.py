@@ -1,5 +1,6 @@
 from django import forms
-from catalogo.models import Autor, Libro, Ejemplar, Genero, Idioma
+# from Proyecto2.biblioProject.catalogo.models import CustomUser
+from catalogo.models import Autor, Libro, Ejemplar, Genero, Idioma, CustomUser
 from django.forms.widgets import NumberInput
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
@@ -115,5 +116,5 @@ class LanguageForm(forms.ModelForm):
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
+        model = CustomUser
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'latitude', 'longitude')

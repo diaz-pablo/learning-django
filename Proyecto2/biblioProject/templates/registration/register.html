@@ -1,26 +1,166 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% load static %}
 {% load crispy_forms_tags %}
 
-<div class="row align-items-center">
-  <div class="col-12 col-md-6 mt-5">
-    <div class="card">
-      <form method="post" action="">
+{% block styles %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==" crossorigin=""/>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<form method="POST" action="" novalidate>
+  <div class="row">
+    <div class="col-12 col-md-6 mt-5">
+      <div class="card">
         <div class="card-body">
           <h5 class="card-title mb-3">Registro de usuario</h5>
 
           {% csrf_token %}
 
-          {{ form | crispy }}
+          <div id="div_id_username" class="form-group"> 
+            <label for="id_username" class=" requiredField">
+                Username<span class="asteriskField">*</span> 
+            </label> 
+        
+            <div> 
+                <input type="text" name="username" maxlength="150" autofocus="" class="textinput textInput form-control {% if form.errors.username %} is-invalid {% endif %}" required="" id="id_username"> 
+                
+                {% if form.errors.username %}
+                    <p id="error_1_id_username" class="invalid-feedback">
+                        {% for error in form.errors.username %}
+                            <strong>{{ error|escape }}</strong>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+        
+                <small id="hint_id_username" class="form-text text-muted">
+                    Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+                </small> 
+            </div> 
+          </div> 
+        
+          <div id="div_id_first_name" class="form-group"> 
+              <label for="id_first_name" class="">
+                  First name
+              </label> 
+              
+              <div> 
+                  <input type="text" name="first_name" maxlength="150" class="textinput textInput form-control" id="id_first_name"> 
+              </div> 
+          </div> 
+        
+          <div id="div_id_last_name" class="form-group"> 
+              <label for="id_last_name" class="">
+                  Last name
+              </label> 
+          
+              <div> 
+                  <input type="text" name="last_name" maxlength="150" class="textinput textInput form-control" id="id_last_name"> 
+              </div> 
+          </div> 
+        
+          <div id="div_id_email" class="form-group"> 
+              <label for="id_email" class="">
+                  Email address
+              </label> 
+          
+              <div> 
+                  <input type="email" name="email" maxlength="254" class="emailinput form-control" id="id_email"> 
+              </div> 
+          </div> 
+        
+          <div id="div_id_password1" class="form-group"> 
+              <label for="id_password1" class=" requiredField">
+                  Password<span class="asteriskField">*</span> 
+              </label> 
+          
+              <div> 
+                  <input type="password" name="password1" autocomplete="new-password" class="textinput textInput form-control {% if form.errors.password1 %} is-invalid {% endif %}" required="" id="id_password1"> 
+          
+                  {% if form.errors.password1 %}
+                      <p id="error_1_id_password1" class="invalid-feedback">
+                          {% for error in form.errors.password1 %}
+                              <strong>{{ error|escape }}</strong>
+                          {% endfor %}
+                      </p>
+                  {% endif %}
+          
+                  <small id="hint_id_password1" class="form-text text-muted">
+                      <ul>
+                          <li>Your password can’t be too similar to your other personal information.</li>
+                          <li>Your password must contain at least 8 characters.</li>
+                          <li>Your password can’t be a commonly used password.</li>
+                          <li>Your password can’t be entirely numeric.</li>
+                      </ul>
+                  </small> 
+              </div> 
+          </div> 
+        
+          <div id="div_id_password2" class="form-group"> 
+              <label for="id_password2" class=" requiredField">
+                  Password confirmation<span class="asteriskField">*</span> 
+              </label> 
+              <div> 
+                  <input type="password" name="password2" autocomplete="new-password" class="textinput textInput form-control {% if form.errors.password2 %} is-invalid {% endif %}" required="" id="id_password2"> 
+          
+                  {% if form.errors.password2 %}
+                      <p id="error_1_id_password2" class="invalid-feedback">
+                          {% for error in form.errors.password2 %}
+                              <strong>{{ error|escape }}</strong>
+                          {% endfor %}
+                      </p>
+                  {% endif %}
+          
+                  <small id="hint_id_password2" class="form-text text-muted">
+                      Enter the same password as before, for verification.
+                  </small> 
+              </div> 
+          </div> 
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 mt-5">
+      <div class="card">
+        <div class="card-body">
+          <div class="form-group">
+            <label class=" requiredField">
+              Latitud y Longitud<span class="asteriskField">*</span> 
+            </label> 
+
+            <div id="map" width="100%" style='height: 500px;'></div>
+
+            <input type="hidden" name="latitude" step="any" class="numberinput form-control {% if form.errors.latitude %} is-invalid {% endif %}" required="" id="id_latitude">
+
+            <input type="hidden" name="longitude" step="any" class="numberinput form-control {% if form.errors.longitude %} is-invalid {% endif %}" required="" id="id_longitude"> 
+
+            {% if form.errors.latitude %}
+                <p id="error_1_id_latitude" class="invalid-feedback">
+                    {% for error in form.errors.latitude %}
+                        <strong>{{ error|escape }}</strong>
+                    {% endfor %}
+                </p>
+            {% endif %}
+
+            <small id="hint_id_username" class="form-text text-muted">
+              Requerido. Haga doble clic para crear un marcador y mantenga presionado para arrastrar y seleccionar su ubicación.
+            </small>
+          </div>
         </div>
         <div class="card-footer d-flex justify-content-end">
           <button type="submit" class="btn btn-success text-uppercase">
             <i class="fas fa-user-plus mr-1"></i> Registrarme
           </button>
         </div>
-      </form>
+      </div>
     </div>
   </div>
-</div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js" integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==" crossorigin=""></script>
+  <script src="{% static 'js/user-record-map.js' %}"></script>
 {% endblock %}

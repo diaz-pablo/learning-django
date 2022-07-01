@@ -135,3 +135,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, '')
 LOGIN_REDIRECT_URL = '/catalogo/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+AUTH_USER_MODEL = 'catalogo.CustomUser'

@@ -1,6 +1,7 @@
 from multiprocessing import context
 from django.shortcuts import render, redirect, get_object_or_404
-from catalogo.models import Idioma, Genero, Libro, Ejemplar, Autor, POI
+from django.contrib.auth.models import Group
+from catalogo.models import Idioma, Genero, Libro, Ejemplar, Autor, POI, CustomUser
 from django.db.models import Count
 from django.views import generic
 from django.views.generic.detail import DetailView
@@ -17,7 +18,6 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import Group
 # Reporte
 import io
 from django.http import FileResponse
@@ -626,18 +626,18 @@ class POIsMapView(LoginRequiredMixin, TemplateView):
     template_name = "map.html"
 
     def get_context_data(self, **kwargs):
-        """Return the view context data."""
         context = super().get_context_data(**kwargs)
 
-        pois = POI.objects.all()
+        # pois = POI.objects.all()
+        pois = CustomUser.objects.filter(groups__name='Members')
         lista = []
 
         for poi in pois:
             json_dict = {}
             json_dict['type'] = 'Feature'
-            json_dict['properties'] = dict(name=poi.nombre)
+            json_dict['properties'] = dict(name=poi.username)
             json_dict['geometry'] = dict(
-                type='Point', coordinates=list([poi.lng, poi.lat]))
+                type='Point', coordinates=list([poi.longitude, poi.latitude]))
             lista.append(json_dict)
 
         context["markers"] = lista

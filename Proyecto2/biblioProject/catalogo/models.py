@@ -1,9 +1,14 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import AbstractUser
 import uuid
 from django.utils.html import mark_safe
 from django.contrib.auth.models import User
 from datetime import date
+
+class CustomUser(AbstractUser):
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
 
 class Genero(models.Model):
     nombre = models.CharField(max_length=50, help_text="Ingrese el nombre del género (xej. Programación, BD, SO, etc)")
@@ -121,7 +126,7 @@ class Ejemplar(models.Model):
     )
 
     estado = models.CharField(max_length=1, choices=ESTADO_EJEMPLAR, default='d', help_text='Disponibilidad del Ejemplar')
-    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    usuario = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
 
     @property
     def es_deudor(self):
@@ -137,7 +142,7 @@ class Ejemplar(models.Model):
         permissions = (("can_view_my_loans", "Puedo ver mis préstamos"),)
 
 class POI(models.Model):
-    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    usuario = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
     nombre = models.CharField(max_length=255)
     lng = models.FloatField()
     lat = models.FloatField()
