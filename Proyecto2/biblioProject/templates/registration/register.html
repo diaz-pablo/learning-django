@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% load static %}
-{% load crispy_forms_tags %}
 
 {% block styles %}
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==" crossorigin=""/>
@@ -21,7 +20,7 @@
 
           <div id="div_id_username" class="form-group"> 
             <label for="id_username" class=" requiredField">
-                Username<span class="asteriskField">*</span> 
+                Nombre de usuario<span class="asteriskField">*</span> 
             </label> 
         
             <div> 
@@ -43,7 +42,7 @@
         
           <div id="div_id_first_name" class="form-group"> 
               <label for="id_first_name" class="">
-                  First name
+                  Nombres
               </label> 
               
               <div> 
@@ -53,7 +52,7 @@
         
           <div id="div_id_last_name" class="form-group"> 
               <label for="id_last_name" class="">
-                  Last name
+                  Apellidos
               </label> 
           
               <div> 
@@ -62,18 +61,26 @@
           </div> 
         
           <div id="div_id_email" class="form-group"> 
-              <label for="id_email" class="">
-                  Email address
-              </label> 
-          
-              <div> 
-                  <input type="email" name="email" maxlength="254" class="emailinput form-control" id="id_email"> 
-              </div> 
-          </div> 
+            <label for="id_email" class=" requiredField">
+              Correo electrónico<span class="asteriskField">*</span> 
+            </label>
+
+            <div> 
+                <input type="email" name="email" maxlength="254" class="emailinput form-control {% if form.errors.email %} is-invalid {% endif %}" required="" id="id_email"> 
+                
+                {% if form.errors.email %}
+                    <p id="error_1_id_email" class="invalid-feedback">
+                        {% for error in form.errors.email %}
+                            <strong>{{ error|escape }}</strong>
+                        {% endfor %}
+                    </p>
+                {% endif %}
+            </div> 
+          </div>
         
           <div id="div_id_password1" class="form-group"> 
               <label for="id_password1" class=" requiredField">
-                  Password<span class="asteriskField">*</span> 
+                  Contraseña<span class="asteriskField">*</span> 
               </label> 
           
               <div> 
@@ -100,7 +107,7 @@
         
           <div id="div_id_password2" class="form-group"> 
               <label for="id_password2" class=" requiredField">
-                  Password confirmation<span class="asteriskField">*</span> 
+                  Confirmación de contraseña<span class="asteriskField">*</span> 
               </label> 
               <div> 
                   <input type="password" name="password2" autocomplete="new-password" class="textinput textInput form-control {% if form.errors.password2 %} is-invalid {% endif %}" required="" id="id_password2"> 

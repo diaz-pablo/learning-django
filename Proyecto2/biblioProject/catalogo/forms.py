@@ -6,6 +6,28 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.forms import ValidationError
 
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'latitude', 'longitude')
+        error_messages = {
+            'username': {
+                'required': "El campo es requerido.",
+            },
+            'email': {
+                'required': "El campo es requerido.",
+            },
+            'password1': {
+                'required': "El campo es requerido.",
+            },
+            'password2': {
+                'required': "El campo es requerido.",
+            },
+            'latitude': {
+                'required': "El campo es requerido.",
+            },
+        }
+
 class AuthorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(AuthorForm, self).__init__(*args, **kwargs)
@@ -114,7 +136,3 @@ class LanguageForm(forms.ModelForm):
         model = Idioma
         fields = ('nombre',)
 
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = CustomUser
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'latitude', 'longitude')

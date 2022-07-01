@@ -1,5 +1,5 @@
 from django.contrib import admin
-from catalogo.models import Idioma, Genero, Autor, Libro, Ejemplar, POI, CustomUser
+from catalogo.models import Idioma, Genero, Autor, Libro, Ejemplar, CustomUser
 
 # Register your models here.
 class IdiomaAdmin(admin.ModelAdmin):
@@ -36,9 +36,9 @@ class EjemplarAdmin(admin.ModelAdmin):
     list_per_page = 10
     # search_fields = ('libro', )
 
-class POIAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'lng', 'lat')
-    list_per_page = 5
+# class POIAdmin(admin.ModelAdmin):
+#     list_display = ('nombre', 'lng', 'lat')
+#     list_per_page = 5
 
 admin.site.register(CustomUser)
 admin.site.register(Idioma, IdiomaAdmin)
@@ -46,4 +46,4 @@ admin.site.register(Genero, GeneroAdmin)
 admin.site.register(Autor, AutorAdmin)
 admin.site.register(Libro, LibroAdmin)
 admin.site.register(Ejemplar, EjemplarAdmin)
-admin.site.register(POI, POIAdmin)
+# admin.site.register(POI, POIAdmin)

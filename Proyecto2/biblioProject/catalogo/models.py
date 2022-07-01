@@ -5,8 +5,10 @@ import uuid
 from django.utils.html import mark_safe
 from django.contrib.auth.models import User
 from datetime import date
+from django.utils.translation import gettext_lazy as _
 
 class CustomUser(AbstractUser):
+    email = models.EmailField(_("email address"))
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
 
@@ -139,10 +141,10 @@ class Ejemplar(models.Model):
     class Meta:
         ordering = ['libro', 'fechaDevolucion']
 
-        permissions = (("can_view_my_loans", "Puedo ver mis préstamos"),)
+        # permissions = (("can_view_my_loans", "Puedo ver mis préstamos"),)
 
-class POI(models.Model):
-    usuario = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
-    nombre = models.CharField(max_length=255)
-    lng = models.FloatField()
-    lat = models.FloatField()
+# class POI(models.Model):
+#     usuario = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+#     nombre = models.CharField(max_length=255)
+#     lng = models.FloatField()
+#     lat = models.FloatField()

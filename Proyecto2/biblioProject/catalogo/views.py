@@ -1,7 +1,7 @@
 from multiprocessing import context
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import Group
-from catalogo.models import Idioma, Genero, Libro, Ejemplar, Autor, POI, CustomUser
+from catalogo.models import Idioma, Genero, Libro, Ejemplar, Autor, CustomUser
 from django.db.models import Count
 from django.views import generic
 from django.views.generic.detail import DetailView
@@ -19,7 +19,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth import authenticate, login
 import calendar
-# Reporte
 import io
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
@@ -28,6 +27,30 @@ from reportlab.lib.pagesizes import A4
 from datetime import date
 from django.core import serializers
 
+def register(request):
+    context = {
+        'form': CustomUserCreationForm()
+    }
+
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            print(form)
+            user = form.save()
+
+            group = Group.objects.get(name='Partners')
+            user.groups.add(group)
+
+            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])
+            login(request, user)
+
+            return redirect('index')
+
+        context['form'] = form
+
+    return render(request, 'registration/register.html', context)
+
+@login_required
 def index(request):
     nroGeneros = Genero.objects.all().count()
     nroIdiomas = Idioma.objects.all().count()
@@ -654,7 +677,7 @@ class POIsMapView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         # pois = POI.objects.all()
-        pois = CustomUser.objects.filter(groups__name='Members')
+        pois = CustomUser.objects.filter(groups__name='Partners')
         lista = []
 
         for poi in pois:
@@ -679,28 +702,7 @@ class MyLoansListView(PermissionRequiredMixin, generic.ListView):
     def get_queryset(self):
         return Ejemplar.objects.filter(usuario=self.request.user).filter(estado__exact='p').order_by('fechaDevolucion')
 
-def register(request):
-    context = {
-        'form': CustomUserCreationForm()
-    }
 
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            print(form)
-            user = form.save()
-
-            group = Group.objects.get(name='Members')
-            user.groups.add(group)
-
-            user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])
-            login(request, user)
-
-            return redirect('index')
-
-        context['form'] = form
-
-    return render(request, 'registration/register.html', context)
 
 def AutorReport(request):
     today = date.today().strftime('%Y-%m-%d')

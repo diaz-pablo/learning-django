@@ -25,6 +25,10 @@
   {% endif %}
 
   <div class="col-12 col-md-6 mt-5">
+    {% load static %}
+    <img src="{% static 'svg/manypixels_login.svg' %}" alt="manypixels_login.svg">
+  </div>
+  <div class="col-12 col-md-6 mt-5">
     <div class="card">
       <form method="post" action="{% url 'login' %}">
         <div class="card-body">
