@@ -18,6 +18,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth import authenticate, login
+import calendar
 # Reporte
 import io
 from django.http import FileResponse
@@ -599,11 +600,35 @@ def language_delete(request, pk):
 
     return redirect('language_list')
 
+# @register.filter
+def month_name(month_number):
+    return calendar.month_name[month_number]
+
 @login_required
 def ChartData(request):
+    # Obtenemos los años
+    years = Ejemplar.objects.dates('fechaDevolucion', 'year')
+    # Obtenemos los meses    
+    months = Ejemplar.objects.order_by('fechaDevolucion').dates('fechaDevolucion', 'month')
+
+    # Ejemplares reservados con fecha de devolucion seteada ordenados por la fecha de devolucion
+    ejemplaresOrdenados = Ejemplar.objects.filter(estado__iexact='p')
+    ejemplaresOrdenados = ejemplaresOrdenados.filter(fechaDevolucion__isnull=False)
+    ejemplaresOrdenados = ejemplaresOrdenados.order_by('fechaDevolucion')
+
+    veiteVeintidos= ejemplaresOrdenados.filter(fechaDevolucion__year=2023)
+    
+    print(month_name(2))
+
+
+    anios = Ejemplar.objects.dates('fechaDevolucion', 'year') # (2022, 2023)
+    
+    # print('-------------------')
+    # for ejemOrd in ejemplaresOrdenados:
+    #     print(ejemOrd.fechaDevolucion)
+
     chartLabel = "Préstamos"
-    etiquetas = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                 'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    etiquetas = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre']
     meses = 12
     minimo = 10
     maximo = 100
@@ -651,8 +676,6 @@ class MyLoansListView(PermissionRequiredMixin, generic.ListView):
     template_name ='my_loans/index.html'
     permission_required = 'catalogo.can_view_my_loans'
 
-    # q = 
-    print(1)
     def get_queryset(self):
         return Ejemplar.objects.filter(usuario=self.request.user).filter(estado__exact='p').order_by('fechaDevolucion')
 
