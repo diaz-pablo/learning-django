@@ -46,5 +46,6 @@ urlpatterns = [
 
     path('mis-prestamos/', views.MyLoansListView.as_view(), name='my_loans'),
 
+
     path('accounts/register/', views.register, name="register"),
 ]
