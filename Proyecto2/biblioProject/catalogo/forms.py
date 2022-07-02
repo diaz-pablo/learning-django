@@ -135,4 +135,3 @@ class LanguageForm(forms.ModelForm):
     class Meta:
         model = Idioma
         fields = ('nombre',)
-

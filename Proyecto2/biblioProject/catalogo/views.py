@@ -1,4 +1,5 @@
 from multiprocessing import context
+from this import d
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import Group
 from catalogo.models import Idioma, Genero, Libro, Ejemplar, Autor, CustomUser
@@ -624,46 +625,40 @@ def language_delete(request, pk):
     return redirect('language_list')
 
 # @register.filter
-def month_name(month_number):
-    return calendar.month_name[month_number]
+def get_month_name(month_number):
+    months = [None, 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    return months[month_number]
+
+def get_color(index):
+    colors = ['#FDCA40', '#254D32', '#181D27', '#A0CCDA', '#9CFFD9', '#947EB0', '#808D8E', '#25283D', '#632A50', '#4392F1', '#DC493A', '#F78154']
+
+    return colors[index]
 
 @login_required
 def ChartData(request):
-    # Obtenemos los años
-    years = Ejemplar.objects.dates('fechaDevolucion', 'year')
     # Obtenemos los meses    
     months = Ejemplar.objects.order_by('fechaDevolucion').dates('fechaDevolucion', 'month')
-
+    
     # Ejemplares reservados con fecha de devolucion seteada ordenados por la fecha de devolucion
-    ejemplaresOrdenados = Ejemplar.objects.filter(estado__iexact='p')
-    ejemplaresOrdenados = ejemplaresOrdenados.filter(fechaDevolucion__isnull=False)
-    ejemplaresOrdenados = ejemplaresOrdenados.order_by('fechaDevolucion')
+    prestados = Ejemplar.objects.filter(estado__iexact='p')
+    conFechaDeDevolucion = prestados.filter(fechaDevolucion__isnull=False)
+    ordenados = conFechaDeDevolucion.order_by('fechaDevolucion')
 
-    veiteVeintidos= ejemplaresOrdenados.filter(fechaDevolucion__year=2023)
-    
-    print(month_name(2))
-
-
-    anios = Ejemplar.objects.dates('fechaDevolucion', 'year') # (2022, 2023)
-    
-    # print('-------------------')
-    # for ejemOrd in ejemplaresOrdenados:
-    #     print(ejemOrd.fechaDevolucion)
+    etiquetas = []
+    datos = []
+    colors = []
+    for m in months:
+        etiquetas.append(get_month_name(m.month))
+        datos.append(ordenados.filter(fechaDevolucion__month=m.month).count())
+        colors.append(get_color(m.month))
 
     chartLabel = "Préstamos"
-    etiquetas = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre']
-    meses = 12
-    minimo = 10
-    maximo = 100
-    datos = []
-
-    for i in range(meses):
-        datos.append(randint(minimo, maximo))
-
+    
     context = {
         "labels": etiquetas,
         "chartLabel": chartLabel,
         "data": datos,
+        "colors": colors
     }
 
     return render(request, 'charts.html', context)

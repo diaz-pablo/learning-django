@@ -40,12 +40,11 @@ urlpatterns = [
     path('idioma/eliminar/<pk>', views.language_delete, name='language_delete'),
     path('idioma/detalle/<pk>', views.LanguageDetailView.as_view(), name='language_details'),
 
-    path('charts/', views.ChartData, name='charts'),
-    path('map/', views.POIsMapView.as_view(), name='map'),
+    path('socios/ver-ubicaciones/', views.POIsMapView.as_view(), name='map'),
+    path('socios/graficas-de-prestamos/', views.ChartData, name='charts'),
+    path('reportes/autor', views.AutorReport, name='reporte_autor'),
 
     path('mis-prestamos/', views.MyLoansListView.as_view(), name='my_loans'),
-
-    path('reportes/autor', views.AutorReport, name='reporte_autor'),
 
     path('accounts/register/', views.register, name="register"),
 ]

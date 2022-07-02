@@ -50,15 +50,16 @@
                                 </a>
                             </li>
                         {% endif %}
-                        <li class="nav-item {% if url_name == 'charts' %} active {% endif %}">
-                            <a class="nav-link" href="{% url 'charts' %}">
-                                Gráficos <span class="sr-only">(current)</span>
+                        <li class="nav-item dropdown {% if url_name == 'map' or url_name == 'charts' or url_name == 'reporte_autor' %} active {% endif %}">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                                Socios
                             </a>
-                        </li>
-                        <li class="nav-item {% if url_name == 'map' %} active {% endif %}">
-                            <a class="nav-link" href="{% url 'map' %}">
-                                Puntos de Interés <span class="sr-only">(current)</span>
-                            </a>
+
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                              <a class="dropdown-item" href="{% url 'map' %}">Ver Ubicaciones</a>
+                              <a class="dropdown-item" href="{% url 'charts' %}">Gráficas de Prestamos</a>
+                              <a class="dropdown-item" href="{% url 'reporte_autor' %}">Generar Reportes</a>
+                            </div>
                         </li>
                     {% endif %}
                 </ul>
@@ -71,13 +72,12 @@
                                 </a>
                             </li>
 
-                            {% if perms.catalogo.can_view_my_loans %}
-                                <li class="nav-item {% if url_name == 'my_loans' %} active {% endif %}">
-                                    <a class="nav-link" href="{% url 'my_loans' %}">
-                                        Mis Préstamos <span class="sr-only">(current)</span>
-                                    </a>
-                                </li>
-                            {% endif %}
+                            <li class="nav-item {% if url_name == 'my_loans' %} active {% endif %}">
+                                <a class="nav-link" href="{% url 'my_loans' %}">
+                                    Mis Préstamos <span class="sr-only">(current)</span>
+                                </a>
+                            </li>
+
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-capitalize" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
                                     {{ user.get_username }}
