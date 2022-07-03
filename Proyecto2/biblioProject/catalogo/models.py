@@ -141,7 +141,7 @@ class Ejemplar(models.Model):
     class Meta:
         ordering = ['libro', 'fechaDevolucion']
 
-        # permissions = (("can_view_my_loans", "Puedo ver mis préstamos"),)
+        permissions = (("can_reserve_a_copy", "Puede reservar ejemplar"), ("can_cancel_reservation", "Puede cancelar reserva"), ("can_view_my_loans", "Puedo ver mis prestamos"))
 
 # class POI(models.Model):
 #     usuario = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)

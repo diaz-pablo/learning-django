@@ -135,3 +135,11 @@ class LanguageForm(forms.ModelForm):
     class Meta:
         model = Idioma
         fields = ('nombre',)
+
+class CopyReservedApprovedForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(CopyReservedApprovedForm, self).__init__(*args, **kwargs)
+
+    class Meta:
+        model = Ejemplar
+        fields = ('fechaDevolucion', )

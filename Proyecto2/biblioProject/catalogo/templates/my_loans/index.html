@@ -15,7 +15,7 @@
 
                 <a href="{% url 'copy_details' my_loan.id %}">{{ my_loan }}</a> 
                 {% if my_loan.es_deudor %}
-                    <span class="text-danger">La fecha de devolución ya ha caducado, debes devolver este libro</span>
+                    <span class="text-danger">La fecha de devolución ha caducado.</span>
                 {% else %}
                     (Fecha de devolución: {{ my_loan.fechaDevolucion }})
                 {% endif %}

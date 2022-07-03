@@ -15,38 +15,45 @@
                                 Inicio <span class="sr-only">(current)</span>
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                Ejemplares <span class="sr-only">(current)</span>
+                            </a>
+                        </li>
+
                         {% if perms.catalogo.view_autor %}
                             <li class="nav-item {% if url_name == 'author_list' %} active {% endif %}">
                                 <a class="nav-link" href="{% url 'author_list' %}">
-                                    Autores <span class="sr-only">(current)</span>
+                                    Adm. Autores <span class="sr-only">(current)</span>
                                 </a>
                             </li>
                         {% endif %}
                         {% if perms.catalogo.view_libro %}
                             <li class="nav-item {% if url_name == 'book_list' %} active {% endif %}">
                                 <a class="nav-link" href="{% url 'book_list' %}">
-                                    Libros <span class="sr-only">(current)</span>
+                                    Adm. Libros <span class="sr-only">(current)</span>
                                 </a>
                             </li>
                         {% endif %}
                         {% if perms.catalogo.view_ejemplar %}
                             <li class="nav-item {% if url_name == 'copy_list' %} active {% endif %}">
                                 <a class="nav-link" href="{% url 'copy_list' %}">
-                                    Ejemplares <span class="sr-only">(current)</span>
+                                    Adm. Ejemplares <span class="sr-only">(current)</span>
                                 </a>
                             </li>
                         {% endif %}
                         {% if perms.catalogo.view_genero %}
                             <li class="nav-item {% if url_name == 'gender_list' %} active {% endif %}">
                                 <a class="nav-link" href="{% url 'gender_list' %}">
-                                    Géneros <span class="sr-only">(current)</span>
+                                    Adm. Géneros <span class="sr-only">(current)</span>
                                 </a>
                             </li>
                         {% endif %}
                         {% if perms.catalogo.view_idioma %}
                             <li class="nav-item {% if url_name == 'language_list' %} active {% endif %}">
                                 <a class="nav-link" href="{% url 'language_list' %}">
-                                    Idiomas <span class="sr-only">(current)</span>
+                                    Adm. Idiomas <span class="sr-only">(current)</span>
                                 </a>
                             </li>
                         {% endif %}
@@ -58,17 +65,16 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                               <a class="dropdown-item" href="{% url 'map' %}">Ver Ubicaciones</a>
                               <a class="dropdown-item" href="{% url 'charts' %}">Gráficas de Prestamos</a>
-                              <a class="dropdown-item" href="{% url 'reporte_autor' %}">Generar Reportes</a>
+                              <a class="dropdown-item" href="{% url 'report' %}" target="_blank">Reporte de Prestamos</a>
                             </div>
                         </li>
                     {% endif %}
                 </ul>
                     <ul class="navbar-nav ml-auto">
                         {% if user.is_authenticated %}
-
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'reporte_autor' %}" target="_blank">
-                                    Reporte de Autores
+                            <li class="nav-item {% if url_name == 'requests' %} active {% endif %}">
+                                <a class="nav-link" href="{% url 'requests' %}">
+                                    Solicitudes <span class="sr-only">(current)</span>
                                 </a>
                             </li>
 

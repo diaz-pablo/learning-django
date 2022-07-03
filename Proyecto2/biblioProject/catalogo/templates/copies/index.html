@@ -29,7 +29,7 @@
                             <th scope="col">Fecha de Devolución</th>
                             <th scope="col">Estado</th>
                             <th scope="col">Usuario</th>
-                            {% if perms.catalogo.change_ejemplar or perms.catalogo.delete_ejemplar %}
+                            {% if perms.catalogo.change_ejemplar or perms.catalogo.delete_ejemplar or perms.catalogo.can_reserve_a_copy or perms.catalogo.can_cancel_reservation %}
                                 <th scope="col" class="text-center">Acciones</th>
                             {% endif %}
                         </tr>
@@ -68,18 +68,42 @@
                                     <p class="text-muted mb-0">No se asignó a ningún usuario</p>
                                 {% endif %}
                             </td>
-                            {% if perms.catalogo.change_ejemplar or perms.catalogo.delete_ejemplar %}
+
+                            {% if perms.catalogo.change_ejemplar or perms.catalogo.delete_ejemplar or perms.catalogo.can_reserve_a_copy or perms.catalogo.can_cancel_reservation %}
                                 <td class="text-center">
                                     <div class="btn-group" role="group" aria-label="Basic example">
+                                        {% if copy.estado == 'd' and copy.usuario is None %}
+                                            {% if perms.catalogo.can_reserve_a_copy %}
+                                                <form action="{% url 'reserve' copy.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    
+                                                    <button type="submit" class="btn btn-success" data-toggle="tooltip" data-placement="top" title="Reservar ejemplar">
+                                                        <i class="fas fa-thumbs-up"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+
+                                        {% elif copy.estado == 'r' and copy.usuario.id == user.id %} 
+                                            {% if perms.catalogo.can_cancel_reservation %}
+                                                <form action="{% url 'cancel_reserve' copy.id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    
+                                                    <button type="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Cancelar reserva">
+                                                        <i class="fas fa-thumbs-down"></i>
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        {% endif %}
+                                        
                                         {% if perms.catalogo.change_ejemplar %}
                                             <a href="{% url 'copy_update' copy.id %}" class="btn btn-warning">
-                                                <i class="fas fa-edit font-weight-light mr-1"></i>
+                                                <i class="fas fa-edit font-weight-light"></i>
                                             </a>
                                         {% endif %}
                                         {% if perms.catalogo.delete_ejemplar %}
                                             <button type="button" class="btn btn-danger" data-toggle="modal"
                                             data-target="#copy-{{ copy.id }}">
-                                                <i class="fas fa-trash-alt font-weight-light mr-1"></i>
+                                                <i class="fas fa-trash-alt font-weight-light"></i>
                                             </button>
                                         {% endif %}
                                     </div>
