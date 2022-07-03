@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+{% include "partials/jumbotron.html" with icon="<i class='fas fa-hands-helping'></i>" title="Solicitudes" %}
+{% endblock %}
+
+{% block content %}
+
+{% include "partials/alert.html" %}
+
+{% if requests %}
+
+    <ul>
+
+        {% for req in requests %}
+            <li class="">
+                <a href="{% url 'copy_details' req.id %}">{{ req }}</a>  <span class="font-weight-bold">(Reservado por {{ req.usuario }})</span>
+                
+                <form action="{% url 'reserve_approved' req.id %}" method="POST" class="form-inline">
+                    {% csrf_token %}
+
+                    <div id="div_id_fechaDevolucion" class="form-group"> 
+                        <label for="id_fechaDevolucion" class="">
+                            Fecha de Devolución*:  
+                        </label> 
+                        <div> 
+                            <input type="date" name="fechaDevolucion" class="numberinput form-control" id="id_fechaDevolucion" required> 
+                        </div> 
+                    </div>
+
+                    <button class="btn btn-success" type="submit">
+                        <i class="fas fa-check mr-1"></i> PRESTAR
+                    </button>
+                </form>
+
+                <form action="{% url 'reserve_not_approved' req.id %}" method="POST" class="d-inline-block form-inline">
+                    {% csrf_token %}
+
+                    <button class="btn btn-danger" type="submit">
+                        <i class="fas fa-times mr-1"></i> RECHAZAR
+                    </button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% block pagination %}
+        {% if is_paginated %}
+            <div class="pagination">
+                <span class="page-links">
+                    {% if page_obj.has_previous %}
+                    <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Anterior</a>
+                    {% endif %}
+                    <span class="page-current">
+                        Pág. {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                    </span>
+                    {% if page_obj.has_next %}
+                    <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">Siguiente</a>
+                    {% endif %}
+                </span>
+            </div>
+        {% endif %}
+    {% endblock %}
+{% else %}
+    <div class="alert alert-primary" role="alert">
+        ¡No hay solicitudes de reservas de libros!
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,5 +1,4 @@
-from multiprocessing import context
-from this import d
+import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import Group
 from catalogo.models import Idioma, Genero, Libro, Ejemplar, Autor, CustomUser
@@ -11,8 +10,7 @@ from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 from django.contrib import messages
-from catalogo.forms import AuthorForm, BookForm, CopyForm, GenderForm, LanguageForm, CustomUserCreationForm
-from random import randint
+from catalogo.forms import AuthorForm, BookForm, CopyForm, GenderForm, LanguageForm, CustomUserCreationForm, CopyReservedApprovedForm
 from django.views.generic.base import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import permission_required
@@ -22,11 +20,17 @@ from django.contrib.auth import authenticate, login
 import calendar
 import io
 from django.http import FileResponse
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.lib.pagesizes import A4
 from datetime import date
 from django.core import serializers
+
+import os
+from django.conf import settings
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from django.contrib.staticfiles import finders
+
+from django.views import View
 
 def register(request):
     context = {
@@ -624,7 +628,6 @@ def language_delete(request, pk):
 
     return redirect('language_list')
 
-# @register.filter
 def get_month_name(month_number):
     months = [None, 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre']
     return months[month_number]
@@ -687,88 +690,128 @@ class POIsMapView(LoginRequiredMixin, TemplateView):
 
         return context
 
-class MyLoansListView(PermissionRequiredMixin, generic.ListView):
+# class MyLoansListView(PermissionRequiredMixin, generic.ListView):
+    # permission_required = 'catalogo.can_view_my_loans'    
+class MyLoansListView(generic.ListView):
     model = Ejemplar
     paginate_by = 5
     context_object_name = 'my_loans'
     template_name ='my_loans/index.html'
-    permission_required = 'catalogo.can_view_my_loans'
 
     def get_queryset(self):
         return Ejemplar.objects.filter(usuario=self.request.user).filter(estado__exact='p').order_by('fechaDevolucion')
 
+class RequestsListView(generic.ListView):
+    model = Ejemplar
+    paginate_by = 5
+    context_object_name = 'requests'
+    template_name ='requests/index.html'
 
+    def get_queryset(self):
+        return Ejemplar.objects.filter(estado__exact='r').order_by('fechaDevolucion')
 
-def AutorReport(request):
-    today = date.today().strftime('%Y-%m-%d')
-    buffer = io.BytesIO()
-    report = canvas.Canvas(buffer, pagesize=A4)
-    data = Autor.objects.all()
-    report.setFont('Helvetica', 15, leading=None)
-    report.setFillColorRGB(0.30,0.45,0.25)
-    report.drawString(260,800,'Catalogo:: Autores')
-    report.line(0,780,1000,780)
-    x1=0
-    y1=750
-    counter = 0
+def reserve_approved(request, pk):
+    copy = get_object_or_404(Ejemplar, pk=pk)
+    copy.estado = 'p'
+    copy.fechaDevolucion = request.POST['fechaDevolucion']
+    copy.save()
 
-    object_list= serializers.serialize("python", data)
+    messages.success(request, f'¡Ejemplar {copy} (reservado por {copy.usuario}) prestado exitosamente!')
 
-    for object in object_list:
-        counter= counter + 1
-        for field_name, field_value in object['fields'].items():
-            if counter==1:
-                report.setFont("Helvetica",12,leading=None)
-                report.drawString(x1+100,y1,field_name)
-                report.line(0,880,1000,780)
-            else:
-                report.setFont("Helvetica",11,leading=None)
-                
-                if field_name=='fechaNac' or field_name=='fechaDeceso':
-                    if field_value!=None:
-                        valor=str(field_value)
-                    else:
-                        valor=''
-                    report.drawString(x1+100,y1, valor) 
-                elif field_name=='image':
-                    if field_value!='':
-                        valor=f'http://localhost:8000/{field_value}'
-                        report.drawImage(valor, x1+100, y1, 25, 25) 
-                else:
-                    valor=field_value
-                    report.drawString(x1+100,y1, valor)
+    return redirect('requests')
 
-            x1 = x1 + 100
-
-        y1 = y1 - 50
-        x1=2
-
-        if counter==1:
-            for field_name, field_value in object['fields'].items():
-                report.setFont("Helvetica",11,leading=None)
-                
-                if field_name=='fechaNac' or field_name=='fechaDeceso':
-                    if field_value!=None:
-                        valor=str(field_value)
-                    else:
-                        valor=''
-                    report.drawString(x1+100,y1, valor) 
-                elif field_name=='image':
-                    if field_value!='':
-                        valor=f'http://localhost:8000/{field_value}'
-                        report.drawImage(valor, x1+100, y1, 25, 25) 
-                else:
-                    valor=field_value
-                    report.drawString(x1+100,y1, valor)
-                x1 = x1 + 100
-
-            y1 = y1 - 50
-            x1=2
-        
-
-    report.setTitle(f'DW2022: Reporte del {today}')
-    report.showPage()
-    report.save()
-    buffer.seek(0)
+def reserve_not_approved(request, pk):
+    copy = get_object_or_404(Ejemplar, pk=pk)
     
-    return FileResponse(buffer, as_attachment=True, filename="reporte.pdf")
+    usuario = copy.usuario
+    
+    copy.estado = 'd'
+    copy.usuario = None
+    copy.save()
+    
+    messages.success(request, f'¡La solicitud de reserva para el Ejemplar {copy} (reservado por {usuario}) ha sido rechazada exitosamente!')
+
+    return redirect('requests')
+
+class CopyReportView(View):
+
+    def link_callback(uri, rel):
+        """
+        Convert HTML URIs to absolute system paths so xhtml2pdf can access those
+        resources
+        """
+        result = finders.find(uri)
+        if result:
+            if not isinstance(result, (list, tuple)):
+                    result = [result]
+            result = list(os.path.realpath(path) for path in result)
+            path=result[0]
+        else:
+            sUrl = settings.STATIC_URL        # Typically /static/
+            sRoot = settings.STATIC_ROOT      # Typically /home/userX/project_static/
+            mUrl = settings.MEDIA_URL         # Typically /media/
+            mRoot = settings.MEDIA_ROOT       # Typically /home/userX/project_static/media/
+
+            if uri.startswith(mUrl):
+                path = os.path.join(mRoot, uri.replace(mUrl, ""))
+            elif uri.startswith(sUrl):
+                path = os.path.join(sRoot, uri.replace(sUrl, ""))
+            else:
+                return uri
+
+        # make sure that file exists
+        if not os.path.isfile(path):
+            raise Exception(
+                'media URI must start with %s or %s' % (sUrl, mUrl)
+            )
+
+        return path
+
+    def get(self, request, *args, **kwargs):
+        template_path = 'partners/pdf.html'
+
+        prestados = Ejemplar.objects.filter(estado__iexact='p')
+        conFechaDeDevolucion = prestados.filter(fechaDevolucion__isnull=False)
+        ordenados = conFechaDeDevolucion.order_by('fechaDevolucion') 
+        
+        context = {
+            'copies': ordenados,
+            'today': date.today(),
+            'icon': f'http://localhost:8000/catalogo{settings.STATIC_URL}img/python-django.png'
+        }
+        
+        response = HttpResponse(content_type='application/pdf')
+        # response['Content-Disposition'] = 'attachment; filename="report.pdf"'
+        
+        template = get_template(template_path)
+        html = template.render(context)
+
+        
+        pisa_status = pisa.CreatePDF(
+            html, dest=response#, link_callback=link_callback
+        )
+        
+        if pisa_status.err:
+            return HttpResponse('We had some errors <pre>' + html + '</pre>')
+        
+        return response
+
+def reserve(request, pk):
+    copy = get_object_or_404(Ejemplar, pk=pk)
+    copy.estado = 'r' 
+    copy.usuario = request.user
+    copy.save()
+
+    messages.success(request, f'¡Ejemplar {copy} reservado exitosamente!')
+
+    return redirect('copy_list')
+
+def cancel_reserve(request, pk):
+    copy = get_object_or_404(Ejemplar, pk=pk)
+    copy.estado = 'd' 
+    copy.usuario = None
+    copy.save()
+
+    messages.success(request, f'¡Cancelación de reserva del Ejemplar {copy} realizado exitosamente!')
+
+    return redirect('copy_list')

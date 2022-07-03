@@ -42,8 +42,15 @@ urlpatterns = [
 
     path('socios/ver-ubicaciones/', views.POIsMapView.as_view(), name='map'),
     path('socios/graficas-de-prestamos/', views.ChartData, name='charts'),
-    path('reportes/autor', views.AutorReport, name='reporte_autor'),
+    path('socios/reporte-de-prestamos/', views.CopyReportView.as_view(), name='report'),
 
+    path('reservar/<pk>', views.reserve, name='reserve'),
+    path('cancelar-reserva/<pk>', views.cancel_reserve, name='cancel_reserve'),
+    path('reserva-aprobada/<pk>', views.reserve_approved, name='reserve_approved'),
+    path('reserva-no-aprobada/<pk>', views.reserve_not_approved, name='reserve_not_approved'),
+
+
+    path('solicitudes/', views.RequestsListView.as_view(), name='requests'),
     path('mis-prestamos/', views.MyLoansListView.as_view(), name='my_loans'),
 
 
