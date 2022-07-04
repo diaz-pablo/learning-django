@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block jumbotron %}
+    {% include "partials/jumbotron.html" with icon="<i class='fas fa-book'></i>" title="Ejemplares" %}
+{% endblock %}
+
+{% block content %}
+{% include "partials/alert.html" %}
+    <div class="row">
+        <div class="col-12 col-md-4">
+            <h1>{{ libro }}</h1>
+            <img src="{{ libro.image.url }}" alt="{{ libro }}" class="img-responsive" width="200px">
+            
+            <hr>
+            
+            <p>
+                <strong>ISBN:</strong>
+                {{ libro.isbn  }}
+            </p>
+            <p>
+                <strong>Resumen:</strong>
+                {{ libro.resumen  }}
+            </p>
+            <p>
+                <strong>Autor:</strong>
+                {% if perms.catalogo.view_autor %}
+                <a href="{% url 'author_details' libro.autor.id %}">{{ libro.autor }}</a>
+                {% else %}
+                {{ libro.autor }}
+                {% endif %}
+            </p>
+            <p>
+                <strong>Género/s:</strong>
+                {{ libro.muestra_genero }}
+            </p>
+            <p>
+                <strong>Idioma:</strong>
+                {{ libro.idioma }}
+            </p>
+            
+            <a href="{% url 'available_copies_list' %}" class="btn btn-link">
+                <i class="fas fa-arrow-left mr-1"></i> VOLVER AL LISTADO
+            </a>
+        </div>
+
+        <div class="col-12 col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="font-weight-bold">LISTADO DE EJEMPLARES DISPONIBLES</span>
+            </div>
+    
+            <div class="card shadow-sm">
+                <div class="card-body table-responsive rounded-top p-0">
+                    <table class="table table-hover table-bordered mb-0">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">#</th>
+                                {% if perms.catalogo.can_reserve_a_copy or perms.catalogo.can_cancel_reservation %}
+                                    <th scope="col" class="text-center">Acciones</th>
+                                {% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for copy in copies %}
+                            <tr>
+                                <th scope="row">
+                                    {% if perms.catalogo.view_ejemplar %}
+                                        <a href="{% url 'copy_details' copy.id %}">{{ copy }}</a>
+                                    {% else %}
+                                        {{ copy.id }}
+                                    {% endif %}
+                                </th>
+    
+                                {% if  perms.catalogo.can_reserve_a_copy or perms.catalogo.can_cancel_reservation %}
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group" aria-label="Basic example">
+                                            {% if copy.estado == 'd' and copy.usuario is None %}
+                                                {% if perms.catalogo.can_reserve_a_copy %}
+                                                    <form action="{% url 'reserve' copy.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        
+                                                        <button type="submit" class="btn btn-success" data-toggle="tooltip" data-placement="top" title="Reservar ejemplar">
+                                                            <i class="fas fa-thumbs-up"></i> RESERVAR EJEMPLAR
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+    
+                                            {% elif copy.estado == 'r' and copy.usuario.id == user.id %} 
+                                                {% if perms.catalogo.can_cancel_reservation %}
+                                                    <form action="{% url 'cancel_reserve' copy.id %}" method="POST">
+                                                        {% csrf_token %}
+                                                        
+                                                        <button type="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Cancelar reserva">
+                                                            <i class="fas fa-thumbs-down"></i> CANCELAR RESERVA
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                            {% empty %}
+                                <tr class="bg-red">
+                                    <td colspan="7" class="text-center">
+                                        ¡Oops! No tenemos Ejemplares de los Libros en Catálogo.
+                                    </th>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+    
+                {% block pagination %}
+                    {% if is_paginated %}
+                        <div class="card-footer">
+                            <div class="pagination">
+                                <span class="page-links">
+                                    {% if page_obj.has_previous %}
+                                    <a href="{{ request.path }}?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                    {% endif %}
+                                    <span class="page-current">
+                                        Pág. {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                                    </span>
+                                    {% if page_obj.has_next %}
+                                    <a href="{{ request.path }}?page={{ page_obj.next_page_number }}">Siguiente</a>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

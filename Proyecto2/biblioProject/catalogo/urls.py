@@ -53,6 +53,8 @@ urlpatterns = [
     path('solicitudes/', views.RequestsListView.as_view(), name='requests'),
     path('mis-prestamos/', views.MyLoansListView.as_view(), name='my_loans'),
 
+    path('ejemplares-disponibles/', views.AvailableCopiesListView.as_view(), name='available_copies_list'),
+    path('ejemplares-disponibles/detalle/<pk>', views.AvailableCopiesDetailView.as_view(), name='available_copies_details'),
 
     path('accounts/register/', views.register, name="register"),
 ]

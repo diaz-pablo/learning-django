@@ -804,7 +804,7 @@ def reserve(request, pk):
 
     messages.success(request, f'¡Ejemplar {copy} reservado exitosamente!')
 
-    return redirect('copy_list')
+    return redirect('available_copies_details', pk=copy.libro.id)
 
 def cancel_reserve(request, pk):
     copy = get_object_or_404(Ejemplar, pk=pk)
@@ -814,4 +814,42 @@ def cancel_reserve(request, pk):
 
     messages.success(request, f'¡Cancelación de reserva del Ejemplar {copy} realizado exitosamente!')
 
-    return redirect('copy_list')
+    return redirect('available_copies_details', pk=copy.libro.id)
+
+class AvailableCopiesListView(ListView):
+    model = Libro
+    template_name = 'available_copies/index.html'
+    paginate_by = 8
+    # context_object_name = 'books'
+
+    def get_context_data(self, **kwargs):
+        books = Libro.objects.order_by('-id')
+        context = super(AvailableCopiesListView, self).get_context_data(**kwargs)
+        paginator = Paginator(books, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            books = paginator.page(page)
+        except PageNotAnInteger:
+            books = paginator.page(1)
+        except EmptyPage:
+            books = paginator.page(paginator.num_pages)
+
+        context['books'] = books
+
+        return context
+
+class AvailableCopiesDetailView(DetailView):
+    model = Libro
+    template_name = 'available_copies/show.html'
+
+    def get_context_data(self, *args, **kwargs):
+        book = Libro.objects.get(pk=self.kwargs['pk'])
+        context = super(AvailableCopiesDetailView, self).get_context_data(*args, **kwargs)
+
+        copies = Ejemplar.objects.filter(libro__pk=book.pk).order_by('estado')
+
+        context["copies"] = copies
+
+        return context
